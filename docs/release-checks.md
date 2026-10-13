@@ -1,4 +1,20 @@
-# Initial release checks
+# Release checks
+
+## v0.2.0 optional modes
+
+The installable folder now contains both mode guides and their standard-library helpers. The public text is adapted from the personal workflow; project/chat identities, machine paths, fixed model preferences and permission overrides are omitted. The four helper/test files preserve the original source bytes.
+
+Checked locally on 13 October 2026:
+
+- Skill-creator validation and `python -B tools/check_package.py` passed, including new mode files, local links, private-path checks and a byte-identical temporary installation.
+- `python -B -m unittest discover -s skills/orchestrate-execution/scripts -p 'test_*.py' -v` ran 32 tests: 31 passed and one symlink escape test was skipped because this Windows host denied symlink creation. Receipt validation, concurrent claims, duplicate/stale/canceled returns, reservation contention, exact-owner release and malformed/corrupt input cases passed.
+- Both helper `--help` commands exited 0. All 16 existing benchmark-runner tests passed. CI includes both suites on Windows and Ubuntu.
+
+These are local helper and packaging checks, not a fresh live handover or a new savings benchmark. The two operating guides require the consuming runtime's exposed launch/send/read controls and current delivery readiness. [Mode benefits and use cases](modes.md) explain how to choose the workflow; [benchmark evidence](benchmarks.md) keeps its existing scope.
+
+One primary source review used GPT-6.1 Sol/high, P2 and no access fallback. It found one mismatch: the initial prose claimed Python 3.10 support, while the reservation helper uses SQLite result-code constants introduced in Python 3.11. The documented minimum was corrected consistently to Python 3.11, including the installable mode guides; helper source and behavior are unchanged. No additional actionable findings were reported. This was one prose remediation batch, so no further model review was needed.
+
+## Initial public package
 
 Checked locally on 13 October 2026. Repository: [K0enna/orchestrate-execution](https://github.com/K0enna/orchestrate-execution). The author selected the [MIT license](../LICENSE). A copy is included in the installable skill directory so the notice travels with the skill.
 

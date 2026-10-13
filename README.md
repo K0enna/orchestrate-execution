@@ -6,7 +6,7 @@
 
 Orchestrate Execution gives Codex a playbook for turning a big request into focused work: choose the right level of reasoning, give each worker a clear job, and bring the results back with proof. Spend your attention on what you want to build.
 
-**[Get started](#get-started)** · **[How it works](#how-it-works)** · **[See the numbers](#the-numbers-behind-the-approach)** · **[Explore examples](docs/examples.md)**
+**[Get started](#get-started)** · **[Choose your mode](#choose-how-the-work-moves)** · **[How it works](#how-it-works)** · **[See the numbers](#the-numbers-behind-the-approach)**
 
 [![Validation](https://github.com/K0enna/orchestrate-execution/actions/workflows/validate.yml/badge.svg)](https://github.com/K0enna/orchestrate-execution/actions/workflows/validate.yml) · [MIT licensed](LICENSE) · Built for Codex
 
@@ -20,6 +20,38 @@ Agent work gets harder to follow when tasks overlap, everyone reloads the same c
 - **Know what actually finished.** Bring back the change, the check results and anything still open. Reuse valid proof instead of repeating sound work.
 
 One accountable coordinator keeps the whole job moving. Each worker gets a bounded assignment and a clear finish line.
+
+## Choose how the work moves
+
+Some jobs need a quick fix. Others need room to run, research to draw on, or a team working on independent pieces. Choose the mode that fits your next outcome.
+
+### Hardcore mode: send the work, step out
+
+Give a substantial, settled task its own worker chat. Once the assignment is ready, the original coordinator ends its turn. The worker finishes the job, saves the result and check evidence, then sends one completion message back so the coordinator can resume and accept it.
+
+**The payoff: less coordination spent waiting for work.** No repeated progress requests while the worker is busy. The assignment stays focused, and the coordinator returns when there is a result to assess. Use it for a well-defined feature, a batch conversion, or a repair with a clear passing check.
+
+```text
+Use $orchestrate-execution. Mode=hardcore.
+Implement the agreed CSV export and run the acceptance checks.
+Let a separate worker finish, then resume here to verify its result.
+```
+
+### Native ChatGPT handover: give research its own space
+
+Send a focused brief to an existing ChatGPT research or writing chat through Codex's native tools. Keep moving on independent coding work, then bring back the source-linked research, specification or polished draft for review and use in the project.
+
+**The payoff: a focused coding task and a reusable research trail.** Put competitor comparisons, literature reviews, product briefs and launch copy in a conversation suited to developing them. Bring the findings back when they can inform the next decision, with sources and a clear deliverable.
+
+```text
+Use $orchestrate-execution. Mode=chatgpt.
+Send this public research brief to our registered Research chat.
+Bring back a source-linked comparison for the implementation decision.
+```
+
+**Bring back the whole report.** Native retrieval reads up to **20,000 characters per returned item**. Larger reports come back in numbered parts below **16,000 characters each**, so the full result stays readable and complete.
+
+Direct work and active native workers remain available for everyday tasks. [Explore the modes, use cases and setup →](docs/modes.md) · [What's new in v0.2.0 →](CHANGELOG.md)
 
 ## From a request to a checked result
 
@@ -77,7 +109,7 @@ The skill works with the model choices and tools available in your Codex setup. 
 
 ## Built in the open
 
-The repository includes the full skill, worked examples, a reproducible decision probe and a coding smoke test. Package checks and **16 deterministic tests** run on Windows and Ubuntu in CI. The coding smoke test passed its two supplied and six independent test methods.
+The repository includes the full skill, worked examples, a reproducible decision probe, a coding smoke test, and local helpers for the two optional modes. Package checks, **16 benchmark-runner tests** and **32 mode-helper tests** run on Windows and Ubuntu in CI. The coding smoke test passed its two supplied and six independent test methods.
 
 [How the skill works](skills/orchestrate-execution/SKILL.md) · [Design and research](docs/design.md) · [Release checks](docs/release-checks.md) · [Contribute](CONTRIBUTING.md)
 

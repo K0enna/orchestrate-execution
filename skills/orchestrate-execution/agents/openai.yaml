@@ -1,4 +1,4 @@
 interface:
   display_name: "Orchestrate Execution"
-  short_description: "Route bounded work and accept current evidence"
-  default_prompt: "Use $orchestrate-execution to choose direct work or bounded delegation and verify the authorized outcome."
+  short_description: "Focused agents, hardcore mode, and ChatGPT handovers"
+  default_prompt: "Use $orchestrate-execution to choose the right execution mode for this task and verify the authorized outcome."

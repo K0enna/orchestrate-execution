@@ -16,3 +16,5 @@ jobs:
         run: python -B tools/check_package.py
       - name: Test benchmark runner without model calls
         run: python -B -m unittest discover -s benchmarks -p "test_*.py" -v
+      - name: Test local mode helpers without chat sends
+        run: python -B -m unittest discover -s skills/orchestrate-execution/scripts -p "test_*.py" -v

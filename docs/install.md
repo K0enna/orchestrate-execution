@@ -36,6 +36,14 @@ cp -R skills/orchestrate-execution/. "$destination/"
 
 Start a Codex session in that project and confirm the skill appears in its available skills. If discovery does not refresh, start a new session. Installation alone does not change models, permissions or tool availability. To remove this installation, remove only the copied directory after checking that it contains no later changes you need.
 
+## Choose an optional mode
+
+The same copied folder includes hardcore mode and native ChatGPT handover. Their local receipt and reservation helpers use **Python 3.11 or later**, with no third-party Python packages. Direct work and active native coordination do not require these helpers.
+
+For hardcore mode, use a runtime with separate worker chats and a terminal message back to the original chat. For native ChatGPT handover, register your existing ChatGPT destination and permitted handover scope in the project's instructions. [Mode setup and prompt examples](modes.md).
+
+Upgrading an existing installation follows the same compare-first rule: review the new folder and replace it deliberately after preserving any local changes.
+
 ## Give it a real task
 
 ```text

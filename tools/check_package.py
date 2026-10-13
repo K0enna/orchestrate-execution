@@ -27,6 +27,13 @@ def main():
         ROOT / "README.md", ROOT / "LICENSE", ROOT / "docs" / "benchmarks.md",
         SKILL / "SKILL.md", SKILL / "agents" / "openai.yaml",
         SKILL / "references" / "codex.md",
+        ROOT / "docs" / "modes.md", ROOT / "CHANGELOG.md",
+        SKILL / "references" / "detached-mode.md",
+        SKILL / "references" / "chatgpt-handover.md",
+        SKILL / "scripts" / "detached_receipt.py",
+        SKILL / "scripts" / "workbench_claim.py",
+        SKILL / "scripts" / "test_detached_receipt.py",
+        SKILL / "scripts" / "test_workbench_claim.py",
     ]
     errors.extend(f"Missing required file: {p.relative_to(ROOT)}" for p in required if not p.is_file())
     core = (SKILL / "SKILL.md").read_text(encoding="utf-8")
@@ -40,7 +47,7 @@ def main():
         errors.append("UI prompt does not invoke this skill")
     errors.extend(check_links(ROOT))
     for p in SKILL.rglob("*"):
-        if p.is_file() and p.suffix in {".md", ".yaml"}:
+        if p.is_file() and p.suffix in {".md", ".yaml", ".py"}:
             text = p.read_text(encoding="utf-8")
             if re.search(r"[A-Za-z]:[/\\](Users|Codex)[/\\]|/home/[^/]+/|/Users/[^/]+/", text):
                 errors.append(f"Machine-specific path in {p.relative_to(ROOT)}")

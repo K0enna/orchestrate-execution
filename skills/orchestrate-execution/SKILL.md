@@ -1,6 +1,6 @@
 ---
 name: orchestrate-execution
-description: Choose direct work or bounded delegation, assign one owner, and accept results against current source and check evidence. Use for execution routing and coordinated tasks, not to start unspecified work or monitoring.
+description: Choose direct work, bounded Codex workers, detached hardcore execution, or native ChatGPT research and writing handovers. Assign one owner and accept results against current source and check evidence.
 ---
 
 # Orchestrate execution
@@ -8,6 +8,18 @@ description: Choose direct work or bounded delegation, assign one owner, and acc
 Complete the authorized outcome with the smallest useful coordination structure. This skill guides an existing coding agent; it does not launch a service, grant permissions, or change the active model. User and runtime instructions control available actions.
 
 ## Choose how to work
+
+Use the user's requested mode, including a plain-language equivalent. These are instruction choices, not app settings or CLI flags:
+
+| Prompt selection | Execution path |
+| --- | --- |
+| `Mode=auto` (default) | Choose direct work or bounded native workers from the task's dependencies. An authorized mapped ChatGPT lane can serve separable research/writing. Detached work requires its own existing authorization. |
+| `Mode=direct` | Keep implementation and checks with the current owner. |
+| `Mode=native` | Use bounded native children while the coordinator stays active for independent work and acceptance. |
+| `Mode=hardcore` or `Mode=detached` | Launch a separate worker, end the parent turn, and resume from one terminal return. Read [hardcore mode](references/detached-mode.md) before dispatch. |
+| `Mode=chatgpt` | Hand substantial research or writing to an authorized existing ChatGPT conversation through native tools. Read [native ChatGPT handover](references/chatgpt-handover.md) before sending. |
+
+Load only the selected mode reference. Keep destination IDs and any standing send grants in the consuming project's instructions, not this package. Mode selection changes coordination and delivery, not the scope of the task or authority for publication, deployment or private-data transfer.
 
 Keep small, inseparable, or tightly coupled work direct. Delegate when an independently useful outcome has settled inputs, a clear owner and check, and the coordinator can do useful independent work. An explicitly authorized lifecycle that suspends the coordinator can also justify delegation, if the runtime supports reliable return delivery. Duration alone is insufficient.
 

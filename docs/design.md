@@ -2,7 +2,7 @@
 
 The skill concentrates on the point where a coordinator assigns work and decides whether to accept it. Its core unit is a bounded outcome with one owner, current source, authority and an observable check. It keeps the direct path available because orchestration can add work even when a task needs only one edit.
 
-The original instructional text was written for this public package from a personal coordination policy. Personal paths, account mappings, incident records and fixed model preferences were omitted. The package keeps the policy's ownership, authority and evidence distinctions without requiring its private helpers. The Codex reference describes conditional runtime binding; it does not supply an adapter or assert parity across products.
+The original instructional text was written for this public package from a personal coordination policy. Personal paths, account mappings, incident records and fixed model preferences were omitted. Version 0.2.0 adds optional hardcore and native ChatGPT handover workflows, with the original standard-library receipt and conversation-reservation helpers. The consuming project supplies its own destinations and grants. The Codex reference describes conditional runtime binding; the runtime supplies task execution and delivery.
 
 ## Decisions that affect behavior
 
@@ -37,4 +37,4 @@ The claimed contribution is a focused combination of coordination rules and exam
 
 For supervised Codex work, the useful distinction is the precision of the assignment and acceptance contract: current source, one writer, effective runtime settings, bounded review, and authority for the final action. These mechanisms overlap with the projects above; the survey does not establish uniqueness.
 
-The main weaknesses are enforcement and evidence. Instructions cannot supply authenticated receipts, runtime checkpoints, resource locks or crash recovery. The current evaluation is small and model-visible, and the skill adds prompt overhead. Users who need durable unattended execution should evaluate a runtime with those guarantees. Keeping this release small avoids adapter maintenance, but also leaves model binding and runtime capability checks to the user.
+The main weaknesses are enforcement and evidence. Instructions cannot supply authenticated receipts, runtime checkpoints or crash recovery. The optional helpers validate local receipt claims and coordinate cooperating local chat senders; they do not provide transport guarantees or distributed locks. The current evaluation is small and model-visible, and the skill adds prompt overhead. Model binding and delivery capability checks remain tied to the user's runtime.

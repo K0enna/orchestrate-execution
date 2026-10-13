@@ -12,6 +12,8 @@ Native final-result delivery and mailbox/event waits support an active coordinat
 
 ## Optional app workers
 
+For `Mode=hardcore` / `Mode=detached`, use the complete [detached workflow](detached-mode.md): save the parent continuation, establish a separate worker and supported terminal callback, end the parent turn, and claim the receipt on return. The bundled helper handles local receipt validation and duplicate handling; the runtime supplies task execution and delivery.
+
 Use an app task only when creating that task is authorized and provides a placement or lifecycle benefit. Resolve the intended project and workspace through supported discovery. Set actual exposed configuration fields; instructions inside the prompt do not configure a task. Verify required visibility, project placement, access and return delivery once before substantive unattended work. If the interface lacks a required control or proof field, report the limitation rather than substituting an unrelated project or hidden worker.
 
 Task archival, interruption and workspace cleanup are separate operations. Use only exposed authorized controls after preserving acceptance evidence. A final answer alone does not establish that background commands have stopped.
@@ -20,4 +22,4 @@ Task archival, interruption and workspace cleanup are separate operations. Use o
 
 Record the required permission context from the user's selected policy; this package supplies no universal sandbox or approval setting. Inspect observed access separately from model choice. A successful read proves that read, not general write privileges or launch inheritance. Never relax access controls to satisfy an assignment.
 
-Cross-task messages and external handovers need user authorization for the recipient and data scope. Native child completion is distinct from sending a new message to another task. This package includes no proprietary app dependency, callback adapter, credential procedure or background service.
+Cross-task messages and external handovers need user authorization for the recipient and data scope. Native child completion is distinct from sending a new message to another task. For `Mode=chatgpt`, use [native ChatGPT handover](chatgpt-handover.md) with a registered ordinary ChatGPT destination and exposed send/read tools. The consuming project owns its destination mappings and grants. The package's local helpers do not configure accounts or transport.
