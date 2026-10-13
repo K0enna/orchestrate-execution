@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+<svg width="1280" height="640" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
   <title id="title">One request. A team with a plan.</title>
   <desc id="desc">Illustrative workflow: a request goes to a coordinator, splits into two one-owner tasks, and merges at verification. Small fixes can stay on a direct implement-and-check path.</desc>
   <defs>
