@@ -1,0 +1,18 @@
+name: Validate
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  package:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check package and temporary installation
+        run: python -B tools/check_package.py
+      - name: Test benchmark runner without model calls
+        run: python -B -m unittest discover -s benchmarks -p "test_*.py" -v

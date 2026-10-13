@@ -1,0 +1,4 @@
+interface:
+  display_name: "Orchestrate Execution"
+  short_description: "Route bounded work and accept current evidence"
+  default_prompt: "Use $orchestrate-execution to choose direct work or bounded delegation and verify the authorized outcome."

@@ -1,0 +1,50 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decisions"
+  ],
+  "properties": {
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "next_action",
+          "accept_return",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "next_action": {
+            "type": "string",
+            "enum": [
+              "work_directly",
+              "dispatch_workers",
+              "resolve_ownership",
+              "verify_configuration",
+              "rerun_checks",
+              "accept_return",
+              "report_budget_exhausted",
+              "prepare_only",
+              "perform_authorized_action",
+              "continue_scoped_work",
+              "report_limitation",
+              "report_missing_evidence"
+            ]
+          },
+          "accept_return": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

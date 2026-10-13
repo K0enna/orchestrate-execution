@@ -1,0 +1,27 @@
+{
+  "kind": "single_candidate_coding_smoke",
+  "requested_model": "gpt-6-luna",
+  "requested_effort": "max",
+  "observed_model": "gpt-6-luna",
+  "observed_effort": "max",
+  "source_before_sha256": "228a8ac3460377236e746f43c46f8bf44641980930b13e41c95fd83e188af7f7",
+  "source_after_sha256": "17891ac5d8768c3002f3d7744db5c1a1fe43ef3e92615fc335d0fdbafdf824f0",
+  "visible_tests": {
+    "methods": 2,
+    "exit_code": 0
+  },
+  "independent_checks": {
+    "methods": 6,
+    "baseline_exit_code": 1,
+    "baseline_failures": 8,
+    "baseline_errors": 1,
+    "candidate_exit_code": 0
+  },
+  "scope_preserved": true,
+  "skill_entrypoint_sha256": "7657298c082026d3208727be6f9b881c748fdec9c95db1d5c0f71d64de5be35e",
+  "limits": [
+    "One candidate run, no paired baseline model run.",
+    "Small Python functions, not a production multi-agent workflow.",
+    "Native evaluation context included coordinator instructions; not an isolated causal comparison."
+  ]
+}

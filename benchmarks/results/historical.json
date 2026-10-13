@@ -1,0 +1,157 @@
+{
+  "kind": "historical_synthetic_worker_comparisons",
+  "audited_on": "2026-10-13",
+  "measurement_scope": "worker turns only; excludes coordinator, separate reviews and tool charges",
+  "boundary_packet_replay": {
+    "date": "2026-09-09",
+    "requested_and_observed_model": "gpt-5.6-sol",
+    "requested_and_observed_effort": "high",
+    "trials_per_arm": 1,
+    "mechanisms_per_bundle": 4,
+    "results": [
+      {
+        "arm": "baseline",
+        "responses": 8,
+        "usage": {
+          "input_tokens": 303371,
+          "cached_input_tokens": 289536,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 10131,
+          "reasoning_output_tokens": 2726,
+          "total_tokens": 313502
+        },
+        "recorded_elapsed_seconds": 392.451,
+        "raw_score": {
+          "passed": 32,
+          "total": 32
+        },
+        "adjudicated_score": {
+          "passed": 31,
+          "total": 31
+        }
+      },
+      {
+        "arm": "candidate",
+        "responses": 6,
+        "usage": {
+          "input_tokens": 217681,
+          "cached_input_tokens": 208256,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 6088,
+          "reasoning_output_tokens": 1726,
+          "total_tokens": 223769
+        },
+        "recorded_elapsed_seconds": 245.452,
+        "raw_score": {
+          "passed": 31,
+          "total": 32
+        },
+        "adjudicated_score": {
+          "passed": 31,
+          "total": 31
+        }
+      }
+    ],
+    "adjudication": "One of 32 original assertions required case-insensitive claims although only actors were specified that way. Excluded symmetrically after grading; raw scores preserved. No candidate repair."
+  },
+  "routing_pair": {
+    "date": "2026-09-12",
+    "trials_per_arm": 1,
+    "results": {
+      "arm-a": {
+        "model": "gpt-5.6-sol",
+        "effort": "medium",
+        "seconds": 69.476,
+        "usage": {
+          "input_tokens": 248446,
+          "cached_input_tokens": 210048,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1941,
+          "reasoning_output_tokens": 253,
+          "total_tokens": 250387
+        },
+        "uncached_input_tokens": 38398,
+        "response_count": 7,
+        "tool_calls": 6,
+        "initial_input_tokens": 32071,
+        "result_bytes": 1329
+      },
+      "arm-b": {
+        "model": "gpt-5.6-luna",
+        "effort": "xhigh",
+        "seconds": 77.267,
+        "usage": {
+          "input_tokens": 241264,
+          "cached_input_tokens": 199168,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 2927,
+          "reasoning_output_tokens": 1520,
+          "total_tokens": 244191
+        },
+        "uncached_input_tokens": 42096,
+        "response_count": 7,
+        "tool_calls": 6,
+        "initial_input_tokens": 31066,
+        "result_bytes": 1118
+      }
+    },
+    "pricing": {
+      "as_of": "2026-09-12",
+      "arms": {
+        "arm-a": {
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "seconds": 69.476,
+          "counts": {
+            "uncached_input": 38398,
+            "cached_input": 210048,
+            "output_including_reasoning": 1941
+          },
+          "api_rates_usd_per_million": [
+            4,
+            0.4,
+            20
+          ],
+          "credit_rates_per_million": [
+            100,
+            10,
+            500
+          ],
+          "estimated_api_equivalent_usd": 0.2764312,
+          "estimated_codex_credit_equivalent": 6.91078
+        },
+        "arm-b": {
+          "model": "gpt-5.6-luna",
+          "effort": "xhigh",
+          "seconds": 77.267,
+          "counts": {
+            "uncached_input": 42096,
+            "cached_input": 199168,
+            "output_including_reasoning": 2927
+          },
+          "api_rates_usd_per_million": [
+            0.2,
+            0.02,
+            1.2
+          ],
+          "credit_rates_per_million": [
+            5,
+            0.5,
+            30
+          ],
+          "estimated_api_equivalent_usd": 0.015914960000000002,
+          "estimated_codex_credit_equivalent": 0.397874
+        }
+      },
+      "actual_billed_dollars": null,
+      "actual_plan_allowance_per_arm": null
+    },
+    "acceptance": "Both passed 5 supplied methods and 187 supplemental assertions; zero repairs. Supplemental grader was written after first return; not blind."
+  },
+  "limits": [
+    "Historical models and small synthetic bundles, not current full-skill production evidence.",
+    "Accumulated input includes cached input; reasoning is included in output. Total=input+output.",
+    "Dated price/credit estimates are not measured bills or allowance deductions.",
+    "Original raw transcripts remain private; aggregates can be recalculated but historic runs cannot be independently reconstructed from this repository."
+  ]
+}

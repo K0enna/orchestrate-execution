@@ -1,0 +1,2 @@
+# Preserve evaluated fixture and recorded benchmark bytes across platforms.
+* -text
