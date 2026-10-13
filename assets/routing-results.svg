@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 600" role="img" aria-labelledby="title desc">
+  <title id="title">Put your budget where it matters</title>
+  <desc id="desc">A historical one-trial routing comparison estimates 94.2 percent lower Codex credit cost for GPT-5.6 Luna at xhigh than GPT-5.6 Sol at medium, alongside 11.2 percent more worker time. These routes are not recommendations, and the estimates are not observed charges.</desc>
+  <rect width="1280" height="600" fill="#0B1020"/>
+  <text x="72" y="65" fill="#A7F3D0" font-family="Segoe UI,Arial,sans-serif" font-size="19" font-weight="700" letter-spacing="2.5">HISTORICAL ROUTING COMPARISON  /  12 SEP 2026</text>
+  <text x="72" y="119" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="48" font-weight="700" letter-spacing="-1">Put your budget where it matters.</text>
+
+  <text x="72" y="220" fill="#D5F879" font-family="Segoe UI,Arial,sans-serif" font-size="72" font-weight="700" letter-spacing="-2">94.2%</text>
+  <text x="293" y="212" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="31" font-weight="600">lower estimated credit cost</text>
+  <text x="1208" y="212" text-anchor="end" fill="#C8D2E3" font-family="Segoe UI,Arial,sans-serif" font-size="27" font-weight="600">+11.2% worker time</text>
+
+  <text x="84" y="293" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="600">GPT-5.6 Sol / medium</text>
+  <rect x="84" y="308" width="900" height="28" rx="7" fill="#33415A" data-value="6.910780" data-max="6.910780"/>
+  <text x="998" y="331" fill="#C8D2E3" font-family="Segoe UI,Arial,sans-serif" font-size="24">6.910780 credits</text>
+
+  <text x="84" y="398" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="600">GPT-5.6 Luna / xhigh</text>
+  <rect x="84" y="413" width="51.815656" height="28" rx="7" fill="#A7F3D0" data-value="0.397874" data-max="6.910780"/>
+  <text x="151" y="436" fill="#A7F3D0" font-family="Segoe UI,Arial,sans-serif" font-size="24">0.397874 credits</text>
+
+  <line x1="84" y1="464" x2="984" y2="464" stroke="#253047" stroke-width="1"/>
+  <text x="72" y="500" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700">Both passed 5 supplied tests + 187 supplemental assertions.</text>
+  <text x="72" y="541" fill="#C8D2E3" font-family="Segoe UI,Arial,sans-serif" font-size="22">Historical routes, not recommendations.  One trial per arm.</text>
+  <text x="72" y="576" fill="#9BAAC2" font-family="Segoe UI,Arial,sans-serif" font-size="21">Dated rate-card estimate, not observed charges.</text>
+</svg>

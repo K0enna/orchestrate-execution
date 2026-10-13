@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">One request. A team with a plan.</title>
+  <desc id="desc">Illustrative workflow: a request goes to a coordinator, splits into two one-owner tasks, and merges at verification. Small fixes can stay on a direct implement-and-check path.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.4" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#A7F3D0"/>
+    </marker>
+  </defs>
+  <rect width="1280" height="640" fill="#0B1020"/>
+  <text x="72" y="54" fill="#A7F3D0" font-family="Segoe UI,Arial,sans-serif" font-size="19" font-weight="700" letter-spacing="2.5">ILLUSTRATIVE WORKFLOW</text>
+  <text x="72" y="112" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="48" font-weight="700" letter-spacing="-1">One request. A team with a plan.</text>
+
+  <path d="M246 327H312" fill="none" stroke="#A7F3D0" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M557 327H606V232H660" fill="none" stroke="#A7F3D0" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M557 327H606V402H660" fill="none" stroke="#D5F879" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M912 232H954V327" fill="none" stroke="#A7F3D0" stroke-width="4"/>
+  <path d="M912 402H954V327" fill="none" stroke="#D5F879" stroke-width="4"/>
+  <path d="M954 327H1000" fill="none" stroke="#A7F3D0" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="58" y="277" width="188" height="100" rx="18" fill="#11192B" stroke="#394761" stroke-width="1.5"/>
+  <text x="84" y="311" fill="#9BAAC2" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="1.5">REQUEST</text>
+  <text x="84" y="344" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">Add CSV</text>
+  <text x="84" y="370" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">export</text>
+
+  <rect x="312" y="277" width="245" height="100" rx="18" fill="#141E32" stroke="#688272" stroke-width="1.5"/>
+  <text x="338" y="312" fill="#A7F3D0" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="1.3">COORDINATOR</text>
+  <text x="338" y="345" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">Agree the CSV</text>
+  <text x="338" y="371" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">format</text>
+
+  <rect x="660" y="176" width="252" height="112" rx="18" fill="#131D31" stroke="#3D6C63" stroke-width="1.5"/>
+  <rect x="682" y="190" width="140" height="26" rx="13" fill="#1A322D"/>
+  <text x="752" y="209" text-anchor="middle" fill="#A7F3D0" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="1.2">ONE OWNER</text>
+  <text x="686" y="246" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">Transform the</text>
+  <text x="686" y="274" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">data</text>
+
+  <rect x="660" y="346" width="252" height="112" rx="18" fill="#1A211F" stroke="#73824A" stroke-width="1.5"/>
+  <rect x="682" y="360" width="140" height="26" rx="13" fill="#2A3122"/>
+  <text x="752" y="379" text-anchor="middle" fill="#D5F879" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="1.2">ONE OWNER</text>
+  <text x="686" y="416" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">Build the download</text>
+  <text x="686" y="444" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">UI</text>
+
+  <rect x="1000" y="277" width="220" height="100" rx="18" fill="#172B28" stroke="#A7F3D0" stroke-width="1.8"/>
+  <text x="1030" y="310" fill="#A7F3D0" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="1.4">VERIFY</text>
+  <text x="1030" y="343" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">Verify the</text>
+  <text x="1030" y="369" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">result</text>
+
+  <rect x="58" y="500" width="1164" height="108" rx="20" fill="#11192B" stroke="#29374F" stroke-width="1.5"/>
+  <text x="84" y="539" fill="#9BAAC2" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="1.5">DIRECT PATH</text>
+  <text x="84" y="577" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="28" font-weight="700">Small fix? Keep it direct.</text>
+  <rect x="483" y="526" width="252" height="56" rx="14" fill="#151F32" stroke="#394761"/>
+  <text x="609" y="562" text-anchor="middle" fill="#C8D2E3" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">One-function fix</text>
+  <path d="M735 554H820" fill="none" stroke="#D5F879" stroke-width="3" marker-end="url(#arrow)"/>
+  <rect x="836" y="526" width="348" height="56" rx="14" fill="#172B28" stroke="#688272"/>
+  <text x="1010" y="562" text-anchor="middle" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">Implement + check</text>
+</svg>

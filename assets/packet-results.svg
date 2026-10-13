@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 730" role="img" aria-labelledby="title desc">
+  <title id="title">Historical worker replay: a clearer brief, less work</title>
+  <desc id="desc">One historical trial compared ordinary and boundary briefs. The boundary brief used 28.6 percent fewer total tokens and 37.5 percent less worker time; both arms passed 31 of 31 specified checks after grader correction.</desc>
+  <rect width="1280" height="730" fill="#0B1020"/>
+  <text x="72" y="76" fill="#A7F3D0" font-family="Segoe UI,Arial,sans-serif" font-size="19" font-weight="700" letter-spacing="2.5">HISTORICAL WORKER REPLAY  /  9 SEP 2026</text>
+  <text x="72" y="132" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="50" font-weight="700" letter-spacing="-1">A clearer brief. Less work.</text>
+
+  <rect x="56" y="177" width="564" height="375" rx="22" fill="#11192B" stroke="#29374F" stroke-width="1.5"/>
+  <rect x="660" y="177" width="564" height="375" rx="22" fill="#11192B" stroke="#29374F" stroke-width="1.5"/>
+  <text x="88" y="247" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="42" font-weight="700">28.6% fewer tokens</text>
+  <text x="692" y="247" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="40" font-weight="700">37.5% less worker time</text>
+
+  <text x="88" y="317" fill="#C8D2E3" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">Ordinary brief</text>
+  <text x="590" y="317" text-anchor="end" fill="#9BAAC2" font-family="Segoe UI,Arial,sans-serif" font-size="24">313,502 total tokens</text>
+  <rect x="88" y="331" width="420" height="30" rx="7" fill="#33415A" data-value="313502" data-max="313502"/>
+  <text x="88" y="411" fill="#C8D2E3" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">Boundary brief</text>
+  <text x="590" y="411" text-anchor="end" fill="#A7F3D0" font-family="Segoe UI,Arial,sans-serif" font-size="24">223,769 total tokens</text>
+  <rect x="88" y="425" width="299.784308" height="30" rx="7" fill="#A7F3D0" data-value="223769" data-max="313502"/>
+  <line x1="88" y1="474" x2="508" y2="474" stroke="#253047" stroke-width="1"/>
+  <text x="88" y="512" fill="#9BAAC2" font-family="Segoe UI,Arial,sans-serif" font-size="20">Total tokens, both arms</text>
+
+  <text x="692" y="317" fill="#C8D2E3" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">Ordinary brief</text>
+  <text x="1194" y="317" text-anchor="end" fill="#9BAAC2" font-family="Segoe UI,Arial,sans-serif" font-size="24">392.451 seconds</text>
+  <rect x="692" y="331" width="420" height="30" rx="7" fill="#33415A" data-value="392.451" data-max="392.451"/>
+  <text x="692" y="411" fill="#C8D2E3" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="600">Boundary brief</text>
+  <text x="1194" y="411" text-anchor="end" fill="#A7F3D0" font-family="Segoe UI,Arial,sans-serif" font-size="24">245.452 seconds</text>
+  <rect x="692" y="425" width="262.682067" height="30" rx="7" fill="#A7F3D0" data-value="245.452" data-max="392.451"/>
+  <line x1="692" y1="474" x2="1112" y2="474" stroke="#253047" stroke-width="1"/>
+  <text x="692" y="512" fill="#9BAAC2" font-family="Segoe UI,Arial,sans-serif" font-size="20">Recorded elapsed time, both arms</text>
+
+  <text x="72" y="600" fill="#F4F7FC" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700">31/31 specified checks passed in both arms after grader correction.</text>
+  <text x="72" y="638" fill="#C8D2E3" font-family="Segoe UI,Arial,sans-serif" font-size="22">One trial per arm  •  Same model and effort  •  Worker-only measurement</text>
+  <text x="72" y="676" fill="#9BAAC2" font-family="Segoe UI,Arial,sans-serif" font-size="20">Raw scores: 32/32 and 31/32; one invalid assertion excluded from both.</text>
+</svg>
