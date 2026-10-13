@@ -6,7 +6,7 @@
 
 Orchestrate Execution gives Codex a playbook for turning a big request into focused work: choose the right level of reasoning, give each worker a clear job, and bring the results back with proof. Spend your attention on what you want to build.
 
-**[Get started](#get-started)** · **[See the numbers](#the-numbers-behind-the-approach)** · **[Explore examples](docs/examples.md)**
+**[Get started](#get-started)** · **[How it works](#how-it-works)** · **[See the numbers](#the-numbers-behind-the-approach)** · **[Explore examples](docs/examples.md)**
 
 [![Validation](https://github.com/K0enna/orchestrate-execution/actions/workflows/validate.yml/badge.svg)](https://github.com/K0enna/orchestrate-execution/actions/workflows/validate.yml) · [MIT licensed](LICENSE) · Built for Codex
 
@@ -28,6 +28,18 @@ Ask for CSV export. Agree the data format, give the independent pieces clear own
 ![Illustrative workflow: one CSV export request becomes two focused assignments and one verified result; small fixes stay direct.](assets/workflow.svg)
 
 The [worked examples](docs/examples.md) show the playbook in action, from a single repair to coordinating several independent changes.
+
+## How it works
+
+**One coordinator. Clear assignments. Results checked against the task.** When you invoke the skill, Codex uses the rules in [`SKILL.md`](skills/orchestrate-execution/SKILL.md) to organize execution through its available tools. The [Codex binding](skills/orchestrate-execution/references/codex.md) connects those rules to worker launch settings, access checks and result delivery.
+
+1. **Define the finish line.** The coordinator reads the relevant code, tests and callers, then sets the expected behavior, allowed changes and exact checks. Workers receive a settled assignment with the current source revision, relevant inputs and acceptance criteria.
+2. **Route by dependency and difficulty.** Small or tightly coupled changes stay direct. Independent outcomes can run in parallel while the coordinator handles other work. A lower-cost model is eligible when it can meet the same acceptance criteria; consequential unresolved questions get specialist attention. Model and reasoning effort are set through the runtime's actual controls.
+3. **Give each worker a clear boundary.** Each subsystem has one active writer. Workers get focused context and source pointers, implement their assignment, and run its checks. Only the original coordinator launches agents, keeping the team to one coordination layer.
+4. **Use completion events.** The coordinator checks launch readiness, including effective settings and input access where the runtime exposes them, then works independently until results arrive. Workers return changed artifacts, source identity, completed check results and any blockers.
+5. **Verify and integrate.** The coordinator checks the return against the current source and agreed outcome. Valid evidence is reused; changed or failed work gets fresh checks. Routine repairs stay with the same owner, and review attempts keep a bounded budget.
+
+The efficiency comes from **focused context, suitable model choices and less repeated work**: fewer overlapping edits, progress polls and unnecessary reruns. You can inspect and adapt every rule in the skill.
 
 ## The numbers behind the approach
 
