@@ -2138,6 +2138,35 @@ def _readiness_block(
     return result
 
 
+def _same_existing_cwd_directory(value: object, expected_path: Path, expected_cwd: str) -> bool:
+    if not isinstance(value, str):
+        return False
+    if value == expected_cwd:
+        return True
+    if "\x00" in value:
+        return False
+    if os.name == "nt":
+        # Require a rooted local drive before any filesystem lookup. This keeps
+        # URI, UNC, device, authority and drive-relative metadata from causing
+        # an untrusted network or device probe.
+        if (
+            len(value) < 3
+            or not value[0].isascii()
+            or not value[0].isalpha()
+            or value[1] != ":"
+            or value[2] not in "\\/"
+            or (len(value) > 3 and value[3] in "\\/")
+        ):
+            return False
+    elif not value.startswith("/") or value.startswith("//"):
+        return False
+    try:
+        observed_path = Path(value)
+        return observed_path.is_dir() and observed_path.samefile(expected_path)
+    except (OSError, ValueError):
+        return False
+
+
 def readiness_result(
     batch_path: Path,
     run_dir: Path,
@@ -2296,7 +2325,12 @@ def readiness_result(
     for observed_key, category in expected_fields:
         expected_key = "cwd" if observed_key in {"session_cwd", "turn_cwd"} else observed_key
         observed_value = _canonical_uuid(observed[observed_key]) if observed_key in {"session_id", "parent_thread_id"} else observed[observed_key]
-        if observed_value != expected[expected_key]:
+        matches = (
+            _same_existing_cwd_directory(observed_value, expected_cwd_path, expected_cwd)
+            if observed_key in {"session_cwd", "turn_cwd"}
+            else observed_value == expected[expected_key]
+        )
+        if not matches:
             return _readiness_block(
                 category,
                 task_id=task_id,

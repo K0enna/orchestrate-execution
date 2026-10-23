@@ -17,6 +17,8 @@ These are the helper's supported routes. Other direct or interactive work follow
 
 The current worker dispatch/readiness helper supports only an actual `danger-full-access` profile with approval `never`, confirmed through the runtime's authorized controls. Restricted or approval-based worker dispatch is unsupported. Keep authorized work direct or hold a specifically required worker route; never upgrade permissions automatically. This is a bounded helper-profile constraint, not permission authority. Revisit it when a real consuming runtime needs restricted dispatch and a source-bound authorized-policy comparison is implemented.
 
+Readiness keeps the raw session and latest-turn cwd values in diagnostics, while comparing them with the caller's cwd by filesystem identity. Existing absolute native paths pass only when they name the same directory. This covers Windows case and 8.3 aliases; different, missing, non-directory, inaccessible or malformed values remain blocked. URI, scheme, device and unsupported remote forms are rejected before lookup. This check does not grant permission or change the other runtime and source guards.
+
 ## Run once, reuse offline
 
 From this reference's sibling `scripts/` directory, run the eligible batch once:

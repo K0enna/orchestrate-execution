@@ -40,7 +40,7 @@ class CompactEvidenceCliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         summary = json.loads(result.stdout)
         self.assertEqual(summary["source"]["sha256"], hashlib.sha256(raw).hexdigest())
-        self.assertEqual(summary["source"]["path"], str(source))
+        self.assertEqual(summary["source"]["path"], str(source.resolve(strict=True)))
         self.assertEqual((summary["failures"], summary["unknowns"], summary["turn_id"]), (1, 1, "latest"))
         self.assertEqual(summary["status"], "unknown")
         self.assertEqual(summary["omissions"]["turn_details"], 3)

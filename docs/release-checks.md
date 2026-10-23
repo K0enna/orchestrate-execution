@@ -1,5 +1,17 @@
 # Release checks
 
+## Native cwd identity compatibility repair
+
+Checked locally on 23 October 2026 with Python 3.12.10 on Windows. Readiness now compares the caller's cwd with the raw session and latest-turn cwd values by existing directory identity. Tests exercised a real Windows 8.3 alias returned by `GetShortPathNameW`, case aliases, both metadata fields, native and app readiness, and the dispatch and prepare-dispatch CLI paths. They also cover different and missing directories, non-directories, denied lookup, malformed and unsupported URI/remote/device inputs before lookup, literal percent and hash filenames, traversal to another directory, and unchanged source and runtime guards.
+
+- `python -B -m unittest discover -s skills/orchestrate-execution/scripts -p test_routing_decisions.py -v` ran 74 tests; all passed.
+- `python -B -m unittest discover -s skills/orchestrate-execution/scripts -p test_compact_evidence.py -v` ran 7 tests; all passed. The compact projector is unchanged; its test now expects the canonical resolved source path it returns.
+- The unaffected adviser suite ran 12 tests; all passed. The receipt suite ran 29 tests: 28 passed and the existing symlink test was skipped because this Windows host denied symlink creation (error 1314). The workbench suite ran 6 tests and the benchmark suite ran 16; all passed.
+- `python -B tools/check_package.py` passed, including package files, local links, metadata, imports, provenance hashes, private-path checks and a temporary installation that refused to overwrite an existing destination.
+- `git -c core.whitespace=cr-at-eol diff --check` passed.
+
+The canonical installed skill was not changed. Tests made no live provider calls. No hosted CI result or release is claimed; the original coordinator owns review and release acceptance.
+
 ## v0.3.0 typed-routing source verification
 
 Checked locally on 23 October 2026 with Python 3.12.10 from the working tree based on `6ef6ca3fccbbf322181f4ae7772fb8b64c870843`. The original coordinator retains the final exact-candidate review and release acceptance.

@@ -328,6 +328,31 @@ class RoutingDecisionsCliTests(unittest.TestCase):
         result_text = out.getvalue() or err.getvalue()
         return code, json.loads(result_text), err.getvalue()
 
+    @staticmethod
+    def same_object_path_alias(directory: Path) -> str:
+        if os.name == "nt":
+            return str(directory).swapcase()
+        return str(directory) + os.sep + "."
+
+    def windows_short_path_alias(self, directory: Path) -> str:
+        import ctypes
+        from ctypes import wintypes
+
+        get_short_path_name = ctypes.WinDLL("kernel32", use_last_error=True).GetShortPathNameW
+        get_short_path_name.argtypes = [wintypes.LPCWSTR, wintypes.LPWSTR, wintypes.DWORD]
+        get_short_path_name.restype = wintypes.DWORD
+        buffer = ctypes.create_unicode_buffer(32768)
+        result = get_short_path_name(str(directory), buffer, len(buffer))
+        self.assertNotEqual(result, 0, f"GetShortPathNameW failed with {ctypes.get_last_error()}")
+        alias = buffer.value
+        self.assertNotEqual(
+            os.path.normcase(alias), os.path.normcase(str(directory)),
+            "the filesystem did not expose a real 8.3 alias for this directory",
+        )
+        self.assertIn("~", Path(alias).name, "GetShortPathNameW did not return an 8.3 basename")
+        self.assertTrue(Path(alias).samefile(directory), "the returned short path is not the same directory")
+        return alias
+
     def make_delivery_run(self, *, include_owner: bool = False, include_hold: bool = False):
         parent_thread = str(uuid4())
         tasks = [self.task("small")]
@@ -1097,6 +1122,67 @@ class RoutingDecisionsCliTests(unittest.TestCase):
         self.assertIn("native final-result delivery", resumed["assignment_message"])
         self.assertNotIn("send exactly one user-authorized callback", resumed["assignment_message"])
         self.assertEqual(resumed["source_packet"], delivery["source_packet"])
+
+    def test_dispatch_cli_accepts_same_directory_session_cwd_alias(self) -> None:
+        batch, run, parent, root = self.make_delivery_run()
+        output = root / "dispatch-identity-delivery.json"
+        code, _stdout, error, _provider = self.invoke_delivery(
+            batch, run, receipt=root / "dispatch-identity-receipt.json",
+            artifact_root=root, output=output,
+        )
+        self.assertEqual(code, 0, error)
+        delivery = json.loads(output.read_bytes())
+        request = self.dispatch_input(delivery, "dispatch-identity-send.json")
+        record = json.loads(request.read_bytes())
+        ready = record["readiness"]
+        expected_cwd = self.root / "dispatch-identity-working-directory"
+        expected_cwd.mkdir()
+        alias = self.same_object_path_alias(expected_cwd)
+        ready["cwd"] = str(expected_cwd)
+        self.write_readiness_session(
+            Path(ready["session_path"]),
+            session_id=ready["thread_id"],
+            parent_thread_id=parent,
+            source="vscode",
+            session_cwd=alias,
+            turn_cwd=str(expected_cwd),
+            model=delivery["model"],
+            effort=delivery["reasoning_effort"],
+        )
+        request.write_text(json.dumps(record), encoding="utf-8")
+
+        code, dispatched = self.trail_cli(
+            "dispatch", batch, run, "--task-id", "small", "--record", request
+        )
+        self.assertEqual(code, 0, dispatched)
+        self.assertEqual(dispatched["assignment_message"], delivery["assignment_message"])
+
+    def test_prepare_dispatch_accepts_same_directory_turn_cwd_alias(self) -> None:
+        batch, run, parent, root = self.make_delivery_run()
+        request, data = self.prepare_request(parent, root)
+        ready = data["readiness"]
+        expected_cwd = self.root / "prepare-identity-working-directory"
+        expected_cwd.mkdir()
+        alias = self.same_object_path_alias(expected_cwd)
+        ready["cwd"] = str(expected_cwd)
+        self.write_readiness_session(
+            Path(ready["session_path"]),
+            session_id=ready["thread_id"],
+            parent_thread_id=parent,
+            source="vscode",
+            session_cwd=str(expected_cwd),
+            turn_cwd=alias,
+            model="gpt-6-luna",
+            effort="max",
+        )
+        request.write_text(json.dumps(data), encoding="utf-8")
+
+        code, prepared = self.trail_cli(
+            "prepare-dispatch", batch, run, "--record", request
+        )
+        self.assertEqual(code, 0, prepared)
+        self.assertEqual(prepared["status"], "dispatch_once")
+        self.assertEqual(prepared["task_id"], "small")
 
     def test_prepare_rejects_invalid_inputs_before_launch_state_and_single_concurrent_winner(self):
         batch, run, parent, root = self.make_delivery_run()
@@ -2463,6 +2549,262 @@ class RoutingDecisionsCliTests(unittest.TestCase):
         self.assertNotIn("agent_path", ready["expected"])
         self.assertNotIn("parent_thread_id", ready["observed"])
         self.assertNotIn("agent_path", ready["observed"])
+
+    def test_readiness_uses_existing_directory_identity_for_session_and_turn_cwd(self) -> None:
+        batch = self.batch_file("cwd-identity-batch.json", [self.task("small")])
+        run_dir = self.root / "cwd-identity-run"
+        code, _output, error, _child = self.invoke_run(
+            batch, run_dir, stdout=self.report_bytes(["small"])
+        )
+        self.assertEqual(code, 0, error)
+        expected_cwd = self.root / "identity%20-compatibility#directory"
+        expected_cwd.mkdir()
+        aliases = [("case-or-native-spelling", self.same_object_path_alias(expected_cwd))]
+        if os.name == "nt":
+            aliases.insert(0, ("windows-8dot3", self.windows_short_path_alias(expected_cwd)))
+        for _alias_name, alias in aliases:
+            self.assertTrue(Path(alias).samefile(expected_cwd), "the cwd alias must name the same directory")
+        session = self.root / "cwd-identity-session.jsonl"
+
+        for alias_name, alias in aliases:
+            for worker_kind in ("native", "app"):
+                for observed_key in ("session_cwd", "turn_cwd"):
+                    with self.subTest(alias=alias_name, worker_kind=worker_kind, field=observed_key):
+                        session_cwd = alias if observed_key == "session_cwd" else str(expected_cwd)
+                        turn_cwd = alias if observed_key == "turn_cwd" else str(expected_cwd)
+                        self.write_readiness_session(
+                            session,
+                            source="vscode" if worker_kind == "app" else None,
+                            session_cwd=session_cwd,
+                            turn_cwd=turn_cwd,
+                        )
+                        ready_code, ready, ready_error = self.invoke_readiness(
+                            batch,
+                            run_dir,
+                            session,
+                            cwd=str(expected_cwd),
+                            worker_kind=worker_kind,
+                            agent_path=None if worker_kind == "app" else "/root/compact_routing",
+                        )
+                        self.assertEqual(
+                            (ready_code, ready.get("status"), ready.get("category")),
+                            (0, "ready", None),
+                            ready_error or json.dumps(ready, sort_keys=True),
+                        )
+                        self.assertEqual(ready["expected"]["cwd"], str(expected_cwd.resolve(strict=True)))
+                        self.assertEqual(ready["observed"][observed_key], alias)
+
+    def test_readiness_blocks_nonmatching_and_unsafe_cwd_before_untrusted_lookup(self) -> None:
+        batch = self.batch_file("cwd-blocked-batch.json", [self.task("small")])
+        run_dir = self.root / "cwd-blocked-run"
+        code, _output, error, _child = self.invoke_run(
+            batch, run_dir, stdout=self.report_bytes(["small"])
+        )
+        self.assertEqual(code, 0, error)
+        expected_cwd = self.root / "expected-cwd"
+        expected_cwd.mkdir()
+        different_cwd = self.root / "different-cwd"
+        different_cwd.mkdir()
+        regular_file = self.root / "not-a-directory.txt"
+        regular_file.write_text("ordinary file", encoding="utf-8")
+        missing_cwd = self.root / "missing-cwd"
+        session = self.root / "cwd-blocked-session.jsonl"
+        blocked_values = [
+            ("different existing directory", str(different_cwd)),
+            ("traversal to different directory", str(different_cwd) + os.sep + ".." + os.sep + different_cwd.name),
+            ("missing directory", str(missing_cwd)),
+            ("regular file", str(regular_file)),
+            ("malformed NUL path", str(expected_cwd) + "\x00suffix"),
+        ]
+        if os.name == "nt":
+            untrusted_values = [
+                "file:///C:/untrusted/path",
+                "https://example.invalid/untrusted/path",
+                r"\\server\share\untrusted",
+                r"\\?\C:\untrusted",
+                r"\\.\PhysicalDrive0",
+                "F:relative-path",
+            ]
+        else:
+            untrusted_values = [
+                "file:///untrusted/path",
+                "https://example.invalid/untrusted/path",
+                "//authority/share/untrusted",
+                "relative-path",
+            ]
+        blocked_values.extend(("unsupported URI/remote/device form", value) for value in untrusted_values)
+
+        for name, bad_cwd in blocked_values:
+            with self.subTest(cwd=name):
+                self.write_readiness_session(
+                    session,
+                    session_cwd=bad_cwd,
+                    turn_cwd=str(expected_cwd),
+                )
+                ready_code, blocked, ready_error = self.invoke_readiness(
+                    batch, run_dir, session, cwd=str(expected_cwd)
+                )
+                self.assertEqual(
+                    (ready_code, blocked.get("status"), blocked.get("category")),
+                    (2, "blocked", "cwd_mismatch"),
+                    ready_error or json.dumps(blocked, sort_keys=True),
+                )
+
+        literal_percent_cwd = self.root / "literal%20#directory"
+        decoded_space_cwd = self.root / "literal #directory"
+        literal_percent_cwd.mkdir()
+        decoded_space_cwd.mkdir()
+        self.write_readiness_session(
+            session,
+            session_cwd=str(literal_percent_cwd),
+            turn_cwd=str(literal_percent_cwd),
+        )
+        ready_code, blocked, ready_error = self.invoke_readiness(
+            batch, run_dir, session, cwd=str(decoded_space_cwd)
+        )
+        self.assertEqual(
+            (ready_code, blocked.get("status"), blocked.get("category")),
+            (2, "blocked", "cwd_mismatch"),
+            ready_error or json.dumps(blocked, sort_keys=True),
+        )
+        ready_code, ready, ready_error = self.invoke_readiness(
+            batch, run_dir, session, cwd=str(literal_percent_cwd)
+        )
+        self.assertEqual(
+            (ready_code, ready.get("status"), ready.get("category")),
+            (0, "ready", None),
+            ready_error or json.dumps(ready, sort_keys=True),
+        )
+
+        # URI, authority, device and malformed inputs must be rejected before
+        # pathlib performs a stat or samefile lookup on the observed value.
+        for bad_cwd in [*untrusted_values, str(expected_cwd) + "\x00suffix"]:
+            with self.subTest(no_lookup=bad_cwd):
+                observed_paths = {str(Path(bad_cwd))}
+                original_stat = Path.stat
+                original_samefile = Path.samefile
+
+                def guarded_stat(path, *args, **kwargs):
+                    if str(path) in observed_paths:
+                        raise AssertionError("untrusted cwd was stat'ed before rejection")
+                    return original_stat(path, *args, **kwargs)
+
+                def guarded_samefile(path, other):
+                    if str(path) in observed_paths:
+                        raise AssertionError("untrusted cwd was compared before rejection")
+                    return original_samefile(path, other)
+
+                self.write_readiness_session(
+                    session,
+                    session_cwd=bad_cwd,
+                    turn_cwd=str(expected_cwd),
+                )
+                with patch.object(Path, "stat", guarded_stat), patch.object(
+                    Path, "samefile", guarded_samefile
+                ):
+                    ready_code, blocked, ready_error = self.invoke_readiness(
+                        batch, run_dir, session, cwd=str(expected_cwd)
+                    )
+                self.assertEqual(
+                    (ready_code, blocked.get("status"), blocked.get("category")),
+                    (2, "blocked", "cwd_mismatch"),
+                    ready_error or json.dumps(blocked, sort_keys=True),
+                )
+
+        denied_cwd = self.root / "inaccessible-cwd"
+        denied_cwd.mkdir()
+        denied_calls = []
+        original_samefile = Path.samefile
+
+        def denied_samefile(path, other):
+            if str(path) == str(denied_cwd):
+                denied_calls.append(str(path))
+                raise PermissionError("simulated denied directory identity lookup")
+            return original_samefile(path, other)
+
+        self.write_readiness_session(session, session_cwd=str(denied_cwd), turn_cwd=str(expected_cwd))
+        with patch.object(Path, "samefile", denied_samefile):
+            ready_code, blocked, ready_error = self.invoke_readiness(
+                batch, run_dir, session, cwd=str(expected_cwd)
+            )
+        self.assertEqual(denied_calls, [str(denied_cwd)])
+        self.assertEqual(
+            (ready_code, blocked.get("status"), blocked.get("category")),
+            (2, "blocked", "cwd_mismatch"),
+            ready_error or json.dumps(blocked, sort_keys=True),
+        )
+
+        if os.name != "nt":
+            case_distinct = expected_cwd.with_name(expected_cwd.name.swapcase())
+            case_distinct.mkdir()
+            self.write_readiness_session(
+                session, session_cwd=str(case_distinct), turn_cwd=str(expected_cwd)
+            )
+            ready_code, blocked, ready_error = self.invoke_readiness(
+                batch, run_dir, session, cwd=str(expected_cwd)
+            )
+            self.assertEqual(
+                (ready_code, blocked.get("status"), blocked.get("category")),
+                (2, "blocked", "cwd_mismatch"),
+                ready_error or json.dumps(blocked, sort_keys=True),
+            )
+
+    def test_equivalent_cwd_does_not_relax_runtime_or_source_guards(self) -> None:
+        batch = self.batch_file("cwd-guard-batch.json", [self.task("small")])
+        run_dir = self.root / "cwd-guard-run"
+        code, _output, error, _child = self.invoke_run(
+            batch, run_dir, stdout=self.report_bytes(["small"])
+        )
+        self.assertEqual(code, 0, error)
+        expected_cwd = self.root / "guard-identity-directory"
+        expected_cwd.mkdir()
+        alias = self.same_object_path_alias(expected_cwd)
+        session = self.root / "cwd-guard-session.jsonl"
+        wrong_latest = {
+            "type": "turn_context",
+            "payload": {
+                "turn_id": "turn-2",
+                "cwd": str(expected_cwd),
+                "model": "gpt-6-luna",
+                "effort": "medium",
+                "approval_policy": "never",
+                "sandbox_policy": {"type": "danger-full-access"},
+            },
+        }
+        cases = [
+            ("session thread", {"session_id": "01a1b94c-9a2d-7e11-a6ef-000000000002"}, "session_id_mismatch"),
+            ("parent", {"parent_thread_id": "different-parent"}, "parent_thread_mismatch"),
+            ("agent", {"agent_path": "/root/different-agent"}, "agent_path_mismatch"),
+            ("source", {"source": "other_app"}, "source_mismatch"),
+            ("model", {"model": "gpt-6.1-sol"}, "model_mismatch"),
+            ("effort", {"effort": "medium"}, "effort_mismatch"),
+            ("approval", {"approval_policy": "on-request"}, "approval_policy_mismatch"),
+            ("sandbox", {"sandbox_type": "workspace-write"}, "sandbox_policy_mismatch"),
+            ("latest turn", {"turn_contexts": [
+                {"type": "turn_context", "payload": {
+                    "turn_id": "turn-1", "cwd": str(expected_cwd), "model": "gpt-6-luna",
+                    "effort": "max", "approval_policy": "never",
+                    "sandbox_policy": {"type": "danger-full-access"},
+                }},
+                wrong_latest,
+            ]}, "effort_mismatch"),
+        ]
+        for name, kwargs, category in cases:
+            with self.subTest(guard=name):
+                self.write_readiness_session(
+                    session,
+                    session_cwd=alias,
+                    turn_cwd=str(expected_cwd),
+                    **kwargs,
+                )
+                ready_code, blocked, ready_error = self.invoke_readiness(
+                    batch, run_dir, session, cwd=str(expected_cwd)
+                )
+                self.assertEqual(
+                    (ready_code, blocked.get("status"), blocked.get("category")),
+                    (2, "blocked", category),
+                    ready_error or json.dumps(blocked, sort_keys=True),
+                )
 
     def test_readiness_rejects_wrong_sources_missing_nested_agent_and_cli_mismatch(self) -> None:
         coordinator = "coordinator-42"
