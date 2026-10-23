@@ -1,5 +1,18 @@
 # Releases
 
+## v0.3.0 — Typed routing and accountable next steps
+
+23 October 2026
+
+- Add an optional OpenAI routing path with two typed worker routes. The coordinator still confirms runtime readiness and dispatches the saved assignment.
+- Add offline reuse for unchanged routing packets and a version 3 selector for next action, resume triage and analytics interpretation.
+- Add `prepare-step`, `apply-step` compatibility and `settle-step` guidance. A suggestion is not execution or acceptance; pending work is not replayed, and downstream evidence is required to record use.
+- Require exactly one matching, evidenced eliminated stage for accepted coordinator steps, while preserving false and unknown acceptance with no eliminated stage.
+- Document the current worker dispatch/readiness profile: actual `danger-full-access` with approval `never`, confirmed through runtime-authorized controls. Restricted or approval-based worker dispatch is unsupported.
+- Package the standard-library routing, adviser and evidence-projection helpers with their source tests. Add portable provenance hashes and package dependency checks.
+
+Historical benchmark figures remain unchanged. No new savings or production-performance measurement is claimed. [Local release checks](docs/release-checks.md) record the verification and reused unaffected checks.
+
 ## v0.2.0 — Choose how the work moves
 
 13 October 2026

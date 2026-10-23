@@ -11,6 +11,8 @@ cd orchestrate-execution
 
 Copy only `skills/orchestrate-execution` into a new `.agents/skills/orchestrate-execution` directory in your project. Review the skill first. If that destination already exists, stop and compare it manually; these commands refuse to overwrite it. No package manager, script, account or service is required for the core skill. Codex must support local skill discovery; delegation additionally needs exposed worker tools.
 
+The current worker dispatch/readiness helper supports only an actual `danger-full-access` profile with approval `never`, confirmed through the runtime's authorized controls. Restricted or approval-based worker dispatch is unsupported. Keep authorized work direct or hold a specifically required worker route; never upgrade permissions automatically. This is a bounded helper-profile constraint, not permission authority. Revisit it when a real consuming runtime needs restricted dispatch and a source-bound authorized-policy comparison is implemented.
+
 From this repository, in PowerShell, replace the project path:
 
 ```powershell
@@ -38,7 +40,7 @@ Start a Codex session in that project and confirm the skill appears in its avail
 
 ## Choose an optional mode
 
-The same copied folder includes hardcore mode and native ChatGPT handover. Their local receipt and reservation helpers use **Python 3.11 or later**, with no third-party Python packages. Direct work and active native coordination do not require these helpers.
+The same copied folder includes the optional OpenAI route helper, evidence projections, hardcore mode and native ChatGPT handover. The local helpers use **Python 3.11 or later** and the standard library. Direct work and active native coordination do not require them. Running a new eligible OpenAI route may send approved task text to OpenAI; unchanged packet reuse, coordinator-step preparation and settlement, receipt handling and evidence projections are local operations. See the [OpenAI routing guide](../skills/orchestrate-execution/references/openai-routing.md) before using that route.
 
 For hardcore mode, use a runtime with separate worker chats and a terminal message back to the original chat. For native ChatGPT handover, register your existing ChatGPT destination and permitted handover scope in the project's instructions. [Mode setup and prompt examples](modes.md).
 

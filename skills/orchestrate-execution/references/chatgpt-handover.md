@@ -28,9 +28,13 @@ Generate and save the claim UUID before acquiring. Only a successful new acquire
 
 ## Bring back the whole artifact
 
-The native reader caps **each returned item at 20,000 characters**. Request `maxOutputCharsPerItem: 20000`, where supported. Pagination retrieves other turns; it cannot recover the truncated tail of one oversized reply. Ask for replies below **16,000 characters**, including headings, sources and markers, so each part fits comfortably.
+For a substantial report, use one complete Markdown file through a destination authorized for this task when both parts of the route are verified: the current writer can place the file at that destination, and the available reader can retrieve the exact revision. Record the destination and revision identifier. Retrieve that exact revision and verify that the complete document matches the requested task and artifact. A writer acknowledgement alone does not prove retrieval or completeness. A destination mapping or visible attachment does not grant permission to use it.
 
-Prefer one reply for a short artifact. For a larger result, agree a bounded number of parts, then send this delivery contract with the brief:
+The native reader caps each returned item at **20,000 characters**. Request `maxOutputCharsPerItem: 20000`, where supported. Pagination retrieves other turns; it cannot recover a truncated tail from one oversized reply.
+
+### Explicit fallback: bounded numbered parts
+
+Use numbered parts only when the verified artifact route is unavailable and multipart delivery is explicitly selected for the task. Prefer one reply for a short artifact. For a larger result, agree a bounded number of parts, then send this delivery contract with the brief:
 
 ```text
 Request ID: <request ID>. Artifact revision: <revision>.
@@ -50,8 +54,7 @@ it to evade the read cap.
 
 Request each next part under the same reserved assignment: `Request <ID>, revision <revision>: return PART i/N from the agreed manifest, below 16,000 characters including markers. Continue the same artifact without new research, revisions or actions.` A changed manifest/revision needs reconciliation before acceptance.
 
-Save complete parts with request, revision, part number and returned turn IDs. Check actual text and truncation indicators, intact end markers and every part from 1 through N. Do not overwrite a conflicting part or accept the whole artifact early. For an already truncated terminal reply, use at most one bounded redelivery of the same work in smaller numbered replies; preserve its source work and identities.
-
+Save complete parts with request, revision, part number and returned turn IDs. Check actual text and truncation indicators, intact end markers and every part from 1 through N. Do not overwrite a conflicting part or accept the whole artifact early. If a verified artifact route is unavailable and the task explicitly selected multipart fallback, an already truncated reply can receive at most one bounded redelivery of the same work in smaller numbered replies; preserve its source work and identities.
 ## Retrieve, check and release
 
 A send acknowledgement establishes submission, not completion. Correlate a completed assistant result with the actual request; a stale read or user-only turn is insufficient. Continue independent Codex work and read at useful checkpoints. Ordinary ChatGPT has no verified native completion callback; if the originating turn ends, save the pending request/claim/next part for its next authorized continuation. Do not attach hardcore's automatic parent-return promise to this route or invent monitoring.

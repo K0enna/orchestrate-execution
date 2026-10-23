@@ -6,7 +6,7 @@
 
 Orchestrate Execution gives Codex a playbook for turning a big request into focused work: choose the right level of reasoning, give each worker a clear job, and bring the results back with proof. Spend your attention on what you want to build.
 
-**[Get started](#get-started)** · **[Choose your mode](#choose-how-the-work-moves)** · **[How it works](#how-it-works)** · **[See the numbers](#the-numbers-behind-the-approach)**
+**[Get started](#get-started)** · **[Choose your mode](#choose-how-the-work-moves)** · **[OpenAI routing](skills/orchestrate-execution/references/openai-routing.md)** · **[How it works](#how-it-works)** · **[See the numbers](#the-numbers-behind-the-approach)**
 
 [![Validation](https://github.com/K0enna/orchestrate-execution/actions/workflows/validate.yml/badge.svg)](https://github.com/K0enna/orchestrate-execution/actions/workflows/validate.yml) · [MIT licensed](LICENSE) · Built for Codex
 
@@ -49,9 +49,9 @@ Send this public research brief to our registered Research chat.
 Bring back a source-linked comparison for the implementation decision.
 ```
 
-**Bring back the whole report.** Native retrieval reads up to **20,000 characters per returned item**. Larger reports come back in numbered parts below **16,000 characters each**, so the full result stays readable and complete.
+**Bring back the whole report.** For substantial reports, use one complete Markdown file through a task-authorized destination only after verifying that the current writer can place it there and the reader can retrieve the exact revision. Retrieve and verify the complete task-correlated document. The native reader caps each returned item at **20,000 characters**. Use bounded numbered parts only when the verified artifact route is unavailable and that fallback is explicitly selected.
 
-Direct work and active native workers remain available for everyday tasks. [Explore the modes, use cases and setup →](docs/modes.md) · [What's new in v0.2.0 →](CHANGELOG.md)
+Direct work and active native workers remain available for everyday tasks. [Explore the modes, use cases and setup →](docs/modes.md) · [What's new in v0.3.0 →](CHANGELOG.md)
 
 ## From a request to a checked result
 
@@ -70,6 +70,7 @@ The [worked examples](docs/examples.md) show the playbook in action, from a sing
 3. **Give each worker a clear boundary.** Each subsystem has one active writer. Workers get focused context and source pointers, implement their assignment, and run its checks. Only the original coordinator launches agents, keeping the team to one coordination layer.
 4. **Use completion events.** The coordinator checks launch readiness, including effective settings and input access where the runtime exposes them, then works independently until results arrive. Workers return changed artifacts, source identity, completed check results and any blockers.
 5. **Verify and integrate.** The coordinator checks the return against the current source and agreed outcome. Valid evidence is reused; changed or failed work gets fresh checks. Routine repairs stay with the same owner, and review attempts keep a bounded budget.
+6. **Keep decisions tied to real outcomes.** When authorized, the optional OpenAI helper selects from its typed worker routes or suggests a next step from permitted alternatives. It prepares records; the coordinator still checks readiness, runs the work through its existing owner, and accepts the actual result. Reuse of an unchanged packet and coordinator-step preparation are local operations.
 
 The efficiency comes from **focused context, suitable model choices and less repeated work**: fewer overlapping edits, progress polls and unnecessary reruns. You can inspect and adapt every rule in the skill.
 
@@ -105,11 +106,11 @@ Keep the work focused, choose direct work or bounded delegation,
 and verify the result before returning it.
 ```
 
-The skill works with the model choices and tools available in your Codex setup. It is an instruction package you can read and adapt, with no service to host or package manager required for the skill itself. You keep control of what gets published, deployed or changed.
+The core skill works with the model choices and tools available in your Codex setup. It is an instruction package with no package manager or service to host. The optional OpenAI routing command sends only eligible task IDs, objectives and approved context when you explicitly run it; unchanged packet reuse, selected-step preparation and settlement are local operations. You keep control of what gets published, deployed or changed.
 
 ## Built in the open
 
-The repository includes the full skill, worked examples, a reproducible decision probe, a coding smoke test, and local helpers for the two optional modes. Package checks, **16 benchmark-runner tests** and **32 mode-helper tests** run on Windows and Ubuntu in CI. The coding smoke test passed its two supplied and six independent test methods.
+The repository includes the full skill, worked examples, a reproducible decision probe, a coding smoke test, and local helpers for routing, evidence projection and the optional modes. The routing and evidence helpers use the Python standard library. Their tests use local fixtures; they make no provider calls. Package checks and the benchmark and helper suites run in CI on Windows and Ubuntu. The coding smoke test passed its two supplied and six independent test methods.
 
 [How the skill works](skills/orchestrate-execution/SKILL.md) · [Design and research](docs/design.md) · [Release checks](docs/release-checks.md) · [Contribute](CONTRIBUTING.md)
 

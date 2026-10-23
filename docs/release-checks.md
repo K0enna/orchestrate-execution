@@ -1,5 +1,30 @@
 # Release checks
 
+## v0.3.0 typed-routing source verification
+
+Checked locally on 23 October 2026 with Python 3.12.10 from the working tree based on `6ef6ca3fccbbf322181f4ae7772fb8b64c870843`. The original coordinator retains the final exact-candidate review and release acceptance.
+
+- The new CLI regression failed on the pre-repair bytes only for `accepted: true` with an empty eliminated-stage list. Its first probe also exposed a fixture error because the generated step has no `boundary` field; the fixture was corrected, and the corrected pre-repair run reproduced the intended failure. The repaired regression passed with matching-stage success and false/unknown empty-stage controls.
+- `python -B -m unittest discover -s skills/orchestrate-execution/scripts -p test_routing_decisions.py -v` ran 69 tests; all passed, with no failures, errors or skips.
+- `python -B tools/check_package.py` passed for the repaired package, including package files, Markdown links, metadata, standard-library imports, provenance hashes, private-path checks and a temporary installation that refused to overwrite an existing destination.
+- `git diff --check` passed.
+- The routing helper and its regression are same-author distribution derivatives for the narrow acceptance-evidence repair. The other eight packaged helper hashes remain unchanged. Canonical installed files were not modified.
+- Tests made no live provider calls. This local verification does not report a hosted CI result or claim publication.
+
+### Earlier v0.3.0 candidate verification (23 October 2026; before the acceptance-evidence repair)
+
+This records the prior candidate-base checks. Their counts and hashes describe the pre-repair bytes, not the repaired source.
+
+- `python -B tools/check_package.py` passed. It checked required package files, Markdown links, skill metadata, standard-library imports, source hashes, machine-specific paths and a byte-identical temporary installation that refused to overwrite an existing destination.
+- The skill-creator `quick_validate.py` metadata check passed.
+- `python -B -m unittest discover -s skills/orchestrate-execution/scripts -p 'test_*.py' -v` ran 122 tests: 121 passed and one symlink test was skipped because this Windows host denied symlink creation (error 1314). No tests failed.
+- `python -B -m unittest discover -s benchmarks -p 'test_*.py' -v` ran 16 tests; all passed.
+- All five production helpers accepted `--help`. The adviser test redirects the OpenAI hostname to a local test server and rejects non-local DNS; tests ran with provider credential variables removed and made no provider calls.
+- All ten packaged helper and test files matched the source-inventory SHA-256 values and the provenance table at that time. The package contained no task-specific paths or run IDs.
+- Bare `git diff --check` passed after normalizing `README.md` and `docs/install.md` to UTF-8 LF. The install guide decoded to the same text; the README also included the separately requested file-first handoff guidance update.
+
+Local helper and benchmark checks ran only on Windows. The existing CI matrix is configured for Windows and Ubuntu; no hosted CI result was produced in that earlier run. Historical benchmark figures remain unchanged, and the packaging update made no performance or savings claim.
+
 ## v0.2.0 optional modes
 
 The installable folder now contains both mode guides and their standard-library helpers. The public text is adapted from the personal workflow; project/chat identities, machine paths, fixed model preferences and permission overrides are omitted. The four helper/test files preserve the original source bytes.

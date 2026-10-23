@@ -1,6 +1,6 @@
 ---
 name: orchestrate-execution
-description: Choose direct work, bounded Codex workers, detached hardcore execution, or native ChatGPT research and writing handovers. Assign one owner and accept results against current source and check evidence.
+description: Choose direct work, bounded Codex workers, detached execution, or native ChatGPT research and writing handovers. Use optional typed OpenAI routing only when authorized, and accept results against current source and check evidence.
 ---
 
 # Orchestrate execution
@@ -21,11 +21,15 @@ Use the user's requested mode, including a plain-language equivalent. These are 
 
 Load only the selected mode reference. Keep destination IDs and any standing send grants in the consuming project's instructions, not this package. Mode selection changes coordination and delivery, not the scope of the task or authority for publication, deployment or private-data transfer.
 
+When the user has authorized the optional OpenAI decision route, read [OpenAI routing and coordinator steps](references/openai-routing.md). It can select a typed worker route for eligible work or suggest a next step from already permissible alternatives. It does not launch workers, grant access, send messages, execute a plan, or establish acceptance. Keep the user's and runtime's actual model and permission controls in charge.
+
 Keep small, inseparable, or tightly coupled work direct. Delegate when an independently useful outcome has settled inputs, a clear owner and check, and the coordinator can do useful independent work. An explicitly authorized lifecycle that suspends the coordinator can also justify delegation, if the runtime supports reliable return delivery. Duration alone is insufficient.
 
 Choose capability before model: bounded execution for settled changes, integration for coupled behavior, and a specialist for one consequential unresolved question. Resolve material uncertainty before dependent implementation. Prefer a less costly available route only when it can satisfy the same acceptance contract. Follow explicit user model and effort choices; do not invent defaults or infer capability from a model name.
 
 Bind those roles to models, effort, permissions and tools exposed by the active runtime. Read [the Codex binding](references/codex.md) before a Codex launch or when its capabilities change. If delegation is unavailable, work directly when authorized. If a specifically required route is unavailable, return the bounded handover and exact limitation. Do not simulate it with hidden processes or new infrastructure.
+
+The OpenAI route helper supports only its documented typed worker routes. Use its saved assignment unchanged after the coordinator verifies current readiness. An unchanged packet can be reused offline; changed inputs need a new disposition. A step recommendation is still a proposal: continue through the existing owner, preserve an in-flight worker's identity and budget, and record the actual downstream result before settling use or acceptance. A pending action stays pending and must not be replayed under a new ID.
 
 ## Set the contract once
 
@@ -67,6 +71,8 @@ Give the worker enough authoritative context to execute; avoid full histories wh
 Distinguish requested configuration from observed configuration. Prompt wording and a launch ID do not prove effective model, effort, permissions, workspace or delivery. Use current runtime evidence when exposed; mark missing fields unverified. If a field is required by the contract, hold dependent work until established. Do not ask a model to identify itself as proof.
 
 For an uncertain launch path, make the first intended worker preflight-only: check the supplied permission context and read one actual assigned input with a bounded command. Withhold substantive writes until readiness is established, then continue the same owner. A mismatch or setup failure needs a supported correction or a truthful blocker, not retries through alternate tools or weaker access. A repaired worker does not prove future launches inherit its settings.
+
+The current worker dispatch/readiness helper supports only an actual `danger-full-access` profile with approval `never`, confirmed through the runtime's authorized controls. Restricted or approval-based worker dispatch is unsupported. Keep authorized work direct or hold a specifically required worker route; never upgrade permissions automatically. This is a bounded helper-profile constraint, not permission authority. Revisit it when a real consuming runtime needs restricted dispatch and a source-bound authorized-policy comparison is implemented.
 
 Coordinate through supported completion events. Do independent work while workers run; use bounded event waits where needed and permitted. Do not poll status on a timer, send progress pings, or replace a worker after an unchanged timeout. Discover status only for a concrete delivery anomaly, ownership conflict or user request. End the coordinator's turn only if an authorized supported return path can resume it; never invent a callback, daemon or schedule.
 

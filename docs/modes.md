@@ -12,6 +12,12 @@ A quick repair, a full implementation and a research report ask different things
 
 Use these selections in your prompt. They are instructions to the skill, and you can describe the same choice in ordinary words.
 
+## OpenAI typed routing and step selection
+
+When you authorize the OpenAI routing workflow, the local helper can select a supported worker route for an eligible, ready assignment. The helper prepares a packet; the coordinator confirms the live worker settings and inputs, then dispatches the saved assignment through the existing runtime. An unchanged assignment can be compiled again offline. Uncertain or pending sends remain with their original action and are not replayed.
+
+The same helper can compare two to six already permissible plans at a next-action, resume-triage or analytics boundary. A `prepare-step` result is a compact suggestion. It does not inspect evidence, execute a plan or grant permission. Continue through the established task owner. If it points to an existing worker, preserve that worker's identity and budget. Record use only from the downstream result; record acceptance separately with evidence. [The operating guide](../skills/orchestrate-execution/references/openai-routing.md) gives the local commands and boundaries.
+
 ## Hardcore mode: a clear job, a focused worker, a useful return
 
 You have agreed what needs to be built. The inputs are ready, the files have an owner, and the check is clear. There is little value in keeping the coordinator occupied with “is it done yet?”
@@ -66,9 +72,9 @@ Keep the full comparison with this project for the implementation handover.
 
 ### Bring back a long report without losing its ending
 
-Native retrieval reads up to **20,000 characters from each returned item**. That is a delivery size, not a maximum report length. The skill requests replies below **16,000 characters**, leaving space for headings, sources and part markers.
+Native retrieval reads up to **20,000 characters from each returned item**. For a substantial report, use one complete Markdown file through a destination authorized for the task after verifying that the current writer can place it there and the reader can retrieve the exact revision. Retrieve and verify the complete task-correlated document.
 
-A long report comes back as numbered chapters. The coordinator retrieves each part, keeps them on the same revision, and checks the full set before accepting the report. You get the complete artifact, with its ending and sources intact. Ordinary ChatGPT handovers are retrieved at useful checkpoints or on the task's next continuation; the automatic parent-return workflow belongs to hardcore mode.
+Use numbered parts only when the verified artifact route is unavailable and that multipart fallback is explicitly selected. Then agree a bounded number of parts below **16,000 characters each**, including headings, sources and markers. Keep them on one artifact revision and verify all parts before accepting the complete report. Ordinary ChatGPT handovers are retrieved at useful checkpoints or on the task's next continuation; the automatic parent-return workflow belongs to hardcore mode.
 
 ## Use them together when the work calls for it
 

@@ -75,12 +75,7 @@ def hash_file(path):
     return digest.hexdigest()
 
 
-def validate_receipt(receipt, run_id, parent_thread, artifact_root):
-    run_id, parent_thread = _uuid(run_id), _uuid(parent_thread)
-    root = _absolute(artifact_root)
-    if not root.is_dir():
-        raise ReceiptError("artifact_root_missing")
-    data, digest = _read_json(_absolute(receipt), MAX_RECEIPT_BYTES)
+def _validate_fields(data, run_id, parent_thread, root):
     _keys(data, "version run_id parent_thread_id outcome summary artifacts checks")
     if type(data["version"]) is not int or data["version"] != 1:
         raise ReceiptError("unsupported_version")
@@ -116,7 +111,92 @@ def validate_receipt(receipt, run_id, parent_thread, artifact_root):
     if data["outcome"] == "completed" and (not data["artifacts"] or not data["checks"] or
                                             any(c["result"] != "pass" for c in data["checks"])):
         raise ReceiptError("completion_proof_required")
+
+
+def validate_receipt(receipt, run_id, parent_thread, artifact_root):
+    run_id, parent_thread = _uuid(run_id), _uuid(parent_thread)
+    root = _absolute(artifact_root)
+    if not root.is_dir():
+        raise ReceiptError("artifact_root_missing")
+    data, digest = _read_json(_absolute(receipt), MAX_RECEIPT_BYTES)
+    _validate_fields(data, run_id, parent_thread, root)
     return data, digest
+
+
+def _new_receipt_path(receipt, root):
+    if not isinstance(receipt, (str, Path)) or not Path(receipt).is_absolute():
+        raise ReceiptError("absolute_path_required")
+    candidate = Path(receipt)
+    try:
+        parent = candidate.parent.resolve(strict=True)
+    except OSError:
+        raise ReceiptError("receipt_parent_missing") from None
+    if not parent.is_dir():
+        raise ReceiptError("receipt_parent_missing")
+    resolved = parent / candidate.name
+    if not resolved.is_relative_to(root):
+        raise ReceiptError("receipt_outside_root")
+    if candidate.exists() or candidate.is_symlink() or resolved.exists() or resolved.is_symlink():
+        raise ReceiptError("receipt_exists")
+    return resolved
+
+
+def write_receipt(receipt, run_id, parent_thread, artifact_root, outcome, summary,
+                  artifacts=None, checks=None):
+    run_id, parent_thread = _uuid(run_id), _uuid(parent_thread)
+    root = _absolute(artifact_root)
+    if not root.is_dir():
+        raise ReceiptError("artifact_root_missing")
+    receipt_path = _new_receipt_path(receipt, root)
+    artifact_paths = [] if artifacts is None else artifacts
+    check_values = [] if checks is None else checks
+    if not isinstance(artifact_paths, list) or not isinstance(check_values, list):
+        raise ReceiptError("invalid_proof_lists")
+    entries = []
+    for value in artifact_paths:
+        path = _absolute(value)
+        if not path.is_relative_to(root):
+            raise ReceiptError("artifact_outside_root")
+        if not path.is_file():
+            raise ReceiptError("missing_or_nonfile_artifact")
+        entries.append({"path": str(path), "sha256": hash_file(path)})
+    data = {
+        "version": 1,
+        "run_id": run_id,
+        "parent_thread_id": parent_thread,
+        "outcome": outcome,
+        "summary": summary,
+        "artifacts": entries,
+        "checks": check_values,
+    }
+    _validate_fields(data, run_id, parent_thread, root)
+    raw = (json.dumps(data, ensure_ascii=True, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
+    if len(raw) > MAX_RECEIPT_BYTES:
+        raise ReceiptError("json_too_large")
+    try:
+        fd = os.open(receipt_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError:
+        raise ReceiptError("receipt_exists") from None
+    except OSError:
+        raise ReceiptError("receipt_write_failed") from None
+    try:
+        with os.fdopen(fd, "wb") as stream:
+            stream.write(raw)
+            stream.flush()
+            os.fsync(stream.fileno())
+    except OSError:
+        raise ReceiptError("receipt_write_failed", recovery=True) from None
+    return {
+        "status": "written",
+        "path": str(receipt_path),
+        "sha256": hashlib.sha256(raw).hexdigest(),
+        "outcome": outcome,
+        "artifact_count": len(entries),
+        "check_counts": {
+            result: sum(1 for check in check_values if check["result"] == result)
+            for result in ("pass", "fail", "not_run")
+        },
+    }
 
 
 def _marker(state_dir, run_id):
@@ -194,6 +274,12 @@ def cancel(state_dir, run_id, parent_thread):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
+    write_command = commands.add_parser("write")
+    for flag in ("receipt", "run-id", "parent-thread", "artifact-root", "outcome", "summary"):
+        write_command.add_argument("--" + flag, required=True)
+    write_command.add_argument("--artifact", action="append", default=[])
+    for flag in ("check-pass", "check-fail", "check-not-run"):
+        write_command.add_argument("--" + flag, action="append", default=[])
     for name in ("claim", "cancel"):
         command = commands.add_parser(name)
         for flag in ("state-dir", "run-id", "parent-thread"):
@@ -204,7 +290,29 @@ def main(argv=None):
     args = vars(parser.parse_args(argv))
     command = args.pop("command")
     try:
-        result = (claim if command == "claim" else cancel)(**args)
+        if command == "write":
+            checks = []
+            for flag, result_value in (
+                ("check-pass", "pass"),
+                ("check-fail", "fail"),
+                ("check-not-run", "not_run"),
+            ):
+                checks.extend(
+                    {"name": name, "result": result_value}
+                    for name in args.pop(flag.replace("-", "_"))
+                )
+            result = write_receipt(
+                receipt=args.pop("receipt"),
+                run_id=args.pop("run_id"),
+                parent_thread=args.pop("parent_thread"),
+                artifact_root=args.pop("artifact_root"),
+                outcome=args.pop("outcome"),
+                summary=args.pop("summary"),
+                artifacts=args.pop("artifact"),
+                checks=checks,
+            )
+        else:
+            result = (claim if command == "claim" else cancel)(**args)
     except ReceiptError as error:
         print(json.dumps({"status": "recovery_needed" if error.recovery else "rejected", "reason": error.reason}))
         return 3 if error.recovery else 2

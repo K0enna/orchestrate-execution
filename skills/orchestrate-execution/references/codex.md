@@ -6,6 +6,8 @@ Read this when delegating in Codex or after a material runtime change. These are
 
 Where `collaboration.spawn_agent` is exposed, use its actual model and effort fields to select the route explicitly. On interfaces that provide `model`, `reasoning_effort` and `fork_turns`, a fresh-context launch uses `fork_turns: "none"` with a complete bounded packet. Full-history inheritance can prevent overrides; inspect the schema before mixing them. Check custom role settings for pins that override the requested route.
 
+The optional [OpenAI decision helper](openai-routing.md) has its own fixed typed route table. It selects a recommendation; the coordinator still uses the runtime's actual launch controls and readiness evidence.
+
 Use launch or current-session evidence for effective configuration, parent identity and workspace. A tool may return only a task name; that is an identifier, not configuration proof. Use an exposed read-only evidence source if available. Otherwise record the missing fields, and do not proceed when the task requires their verification. Avoid private transcript dumps, internal database edits and unsupported control interfaces.
 
 Native final-result delivery and mailbox/event waits support an active coordinator where documented by the runtime. Respect current timeout limits. They do not by themselves establish that ending the parent turn will restart it later. Keep the coordinator active for ordinary native coordination unless the supported lifecycle establishes otherwise.

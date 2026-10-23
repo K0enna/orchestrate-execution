@@ -1,5 +1,8 @@
 import copy
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import redirect_stderr, redirect_stdout
+import hashlib
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -43,6 +46,116 @@ class ReceiptTests(unittest.TestCase):
         with self.assertRaises(receipts.ReceiptError) as result:
             self.claim(**overrides)
         self.assertEqual(result.exception.reason, reason)
+
+    def invoke_write(self, name, *, outcome="completed", summary="Bounded task result.",
+                     artifacts=(), checks=(), run_id=None, parent_thread=None,
+                     receipt=None, artifact_root=None):
+        receipt = self.artifacts / name if receipt is None else Path(receipt)
+        args = [
+            "write",
+            "--receipt", str(receipt),
+            "--run-id", self.run if run_id is None else run_id,
+            "--parent-thread", self.parent if parent_thread is None else parent_thread,
+            "--artifact-root", str(self.artifacts if artifact_root is None else artifact_root),
+            "--outcome", outcome,
+            "--summary", summary,
+        ]
+        for artifact in artifacts:
+            args.extend(["--artifact", str(artifact)])
+        for result, check_name in checks:
+            flag = {"pass": "--check-pass", "fail": "--check-fail", "not_run": "--check-not-run"}[result]
+            args.extend([flag, check_name])
+        out = io.StringIO()
+        err = io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            code = receipts.main(args)
+        return code, json.loads(out.getvalue() or err.getvalue()), receipt
+
+    def test_write_completed_and_blocked_receipts_then_claim(self):
+        second = self.artifacts / "second-proof.txt"
+        second.write_text("second verified result\n", encoding="utf-8")
+        cases = (
+            ("completed.json", "completed", [self.artifact, second],
+             [("pass", "focused suite passed"), ("pass", "result inspected")]),
+            ("blocked.json", "blocked", [], [("not_run", "native turn completion")]),
+        )
+        for name, outcome, artifacts, checks in cases:
+            with self.subTest(outcome=outcome):
+                run_id = str(uuid4())
+                code, result, receipt_path = self.invoke_write(
+                    name, outcome=outcome, artifacts=artifacts, checks=checks,
+                    run_id=run_id,
+                )
+                self.assertEqual(code, 0, result)
+                self.assertEqual(result["status"], "written")
+                self.assertEqual(result["outcome"], outcome)
+                self.assertEqual(result["artifact_count"], len(artifacts))
+                self.assertEqual(result["path"], str(receipt_path.resolve()))
+                saved = json.loads(receipt_path.read_text(encoding="utf-8"))
+                self.assertEqual(result["sha256"], hashlib.sha256(receipt_path.read_bytes()).hexdigest())
+                self.assertEqual(set(saved), {
+                    "version", "run_id", "parent_thread_id", "outcome", "summary", "artifacts", "checks"
+                })
+                self.assertEqual(saved["outcome"], outcome)
+                self.assertEqual(saved["run_id"], run_id)
+                self.assertEqual(len(saved["artifacts"]), len(artifacts))
+                self.assertEqual(len(saved["checks"]), len(checks))
+                if outcome == "completed":
+                    self.assertEqual(saved["checks"], [
+                        {"name": "focused suite passed", "result": "pass"},
+                        {"name": "result inspected", "result": "pass"},
+                    ])
+                    self.assertEqual(result["check_counts"], {"pass": 2, "fail": 0, "not_run": 0})
+                else:
+                    self.assertEqual(saved["artifacts"], [])
+                    self.assertEqual(saved["checks"], [
+                        {"name": "native turn completion", "result": "not_run"}
+                    ])
+                claimed = receipts.claim(
+                    receipt=receipt_path, state_dir=self.state, run_id=run_id,
+                    parent_thread=self.parent, artifact_root=self.artifacts,
+                )
+                self.assertEqual((claimed["status"], claimed["outcome"]), ("claimed", outcome))
+
+    def test_write_rejects_invalid_metadata_and_completion_proof_before_creation(self):
+        outside = self.root / "outside-proof.txt"
+        outside.write_text("outside root", encoding="utf-8")
+        cases = (
+            ("invalid-id.json", "completed", [], [], {"run_id": "invalid"}, "invalid_uuid"),
+            ("no-proof.json", "completed", [], [], {}, "completion_proof_required"),
+            ("failed-check.json", "completed", [self.artifact], [("fail", "suite")], {}, "completion_proof_required"),
+            ("not-run-check.json", "completed", [self.artifact], [("not_run", "suite")], {}, "completion_proof_required"),
+            ("invalid-name.json", "completed", [self.artifact], [("pass", " ")], {}, "invalid_check_name"),
+            ("invalid-outcome.json", "running", [], [], {}, "unsupported_outcome"),
+            ("outside-artifact.json", "blocked", [outside], [], {}, "artifact_outside_root"),
+        )
+        for name, outcome, artifacts, checks, overrides, reason in cases:
+            with self.subTest(name=name):
+                code, result, receipt_path = self.invoke_write(
+                    name, outcome=outcome, artifacts=artifacts, checks=checks, **overrides
+                )
+                self.assertEqual(code, 2)
+                self.assertEqual(result["reason"], reason)
+                self.assertFalse(receipt_path.exists())
+
+        escaped = self.root / "escaped-receipt.json"
+        code, result, receipt_path = self.invoke_write(
+            "escaped-receipt.json", receipt=escaped, outcome="blocked"
+        )
+        self.assertEqual(code, 2)
+        self.assertEqual(result["reason"], "receipt_outside_root")
+        self.assertFalse(receipt_path.exists())
+
+    def test_write_never_overwrites_existing_receipt(self):
+        before = b"preserve existing receipt\n"
+        existing = self.artifacts / "already-there.json"
+        existing.write_bytes(before)
+        code, result, receipt_path = self.invoke_write(
+            "already-there.json", receipt=existing, outcome="blocked"
+        )
+        self.assertEqual(code, 2)
+        self.assertEqual(result["reason"], "receipt_exists")
+        self.assertEqual(receipt_path.read_bytes(), before)
 
     def test_completed_and_duplicate(self):
         self.write()
