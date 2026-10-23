@@ -1,5 +1,15 @@
 # Release checks
 
+## Canonical output expectations
+
+Checked locally on 23 October 2026 after Windows CI exposed four expectations that compared raw temporary-directory spellings with canonical output paths. Only the routing tests and this verification/provenance record changed. Production helpers are unchanged.
+
+- All four affected tests and the five native-directory identity/guard regressions passed in one focused nine-test run. Raw observed cwd assertions, literal shell-character checks and the real Windows 8.3 alias control remain in place.
+- The complete routing suite ran 74 tests; all passed.
+- Package, provenance and temporary-install checks passed.
+
+The existing source review remains applicable to the unchanged production bytes. Hosted Windows and Ubuntu checks remain a separate release gate.
+
 ## Native cwd identity compatibility repair
 
 Checked locally on 23 October 2026 with Python 3.12.10 on Windows. Readiness now compares the caller's cwd with the raw session and latest-turn cwd values by existing directory identity. Tests exercised a real Windows 8.3 alias returned by `GetShortPathNameW`, case aliases, both metadata fields, native and app readiness, and the dispatch and prepare-dispatch CLI paths. They also cover different and missing directories, non-directories, denied lookup, malformed and unsupported URI/remote/device inputs before lookup, literal percent and hash filenames, traversal to another directory, and unchanged source and runtime guards.

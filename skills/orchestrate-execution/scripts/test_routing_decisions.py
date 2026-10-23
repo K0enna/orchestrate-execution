@@ -991,7 +991,7 @@ class RoutingDecisionsCliTests(unittest.TestCase):
         with patch.object(router.subprocess, 'run') as child:
             code, selected = self.trail_cli('prepare-step', batch, run, '--task-id', 'triage')
             self.assertEqual(code, 0, selected); child.assert_not_called()
-        self.assertEqual(selected['continuation'], {'delivery': task['evidence'][1], 'action_id': original['action_id'],
+        self.assertEqual(selected['continuation'], {'delivery': {**task['evidence'][1], 'path': str(delivery_path.resolve(strict=True))}, 'action_id': original['action_id'],
             'task_id': 'small', 'next_operation': 'prepare-dispatch', 'mode': 'offline_reuse'})
         self.assertEqual(selected['plan'], task['candidates'][0]['plan'])
         _,applied,step=self.step_apply(batch,run)
@@ -1107,7 +1107,9 @@ class RoutingDecisionsCliTests(unittest.TestCase):
         self.assertIn("native final-result delivery", message)
         self.assertNotIn("send exactly one user-authorized callback", message)
         self.assertIn(data["run_id"], message)
-        self.assertIn(data["receipt"], message)
+        expected_receipt = str(Path(data["receipt"]).parent.resolve(strict=True) / Path(data["receipt"]).name)
+        self.assertEqual(delivery["receipt"], expected_receipt)
+        self.assertIn(expected_receipt, message)
         self.assertEqual(self.trail_cli("prepare-dispatch", batch, run, "--record", request)[0], 2)
         interrupted, _ = self.action_input(delivery, "native-interrupted.json", state="interrupted")
         self.assertEqual(self.trail_cli("observe", batch, run, "--task-id", "small", "--record", interrupted)[0], 0)
@@ -1525,8 +1527,8 @@ class RoutingDecisionsCliTests(unittest.TestCase):
         vector = delivery.get("receipt_command_argv")
         self.assertIsInstance(vector, list)
         self.assertTrue(all(isinstance(item, str) for item in vector))
-        self.assertEqual(vector[vector.index("--receipt") + 1], str(receipt))
-        self.assertEqual(vector[vector.index("--artifact-root") + 1], str(special))
+        self.assertEqual(vector[vector.index("--receipt") + 1], str(receipt.parent.resolve(strict=True) / receipt.name))
+        self.assertEqual(vector[vector.index("--artifact-root") + 1], str(special.resolve(strict=True)))
         receiver = self.root / "argv_receiver.py"
         receiver.write_text("import json,sys; print(json.dumps(sys.argv[1:]))", encoding="utf-8")
         suffix = vector[3:] + ["literal $proof", "space and 'single' and \"double\"", "$()", "$( )"]
@@ -2480,7 +2482,7 @@ class RoutingDecisionsCliTests(unittest.TestCase):
                 "source_kind": "native_subagent",
                 "parent_thread_id": "coordinator-42",
                 "agent_path": "/root/compact_routing",
-                "cwd": str(self.root),
+                "cwd": str(self.root.resolve(strict=True)),
                 "model": "gpt-6-luna",
                 "effort": "max",
                 "approval_policy": "never",
