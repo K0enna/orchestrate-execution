@@ -1,5 +1,17 @@
 # Release checks
 
+## Native aliases in adoption exports
+
+The later Windows run reached continuation-export validation and exposed duplicate evidence paths: aliases were deduplicated before resolution, then emitted with the same canonical path. Both adoption exporters now deduplicate by the canonical native path they emit. The strict importer is unchanged.
+
+Checked locally on 23 October 2026:
+
+- The existing continuation regression now supplies a real Windows 8.3 alias. It failed before the exporter repair with `step_export_invalid`, then passed with confirmed use retained, unique references from both exporters, and duplicate/hash-tampering rejection.
+- All 74 routing tests passed. The existing native-directory, source, runtime, replay and containment controls remain in place.
+- Package, provenance and temporary-install checks passed.
+
+The coordinator retains earlier source-review and failed-CI evidence. An exact-delta review and new Windows/Ubuntu CI acceptance are required before publishing the repaired package.
+
 ## Canonical output expectations
 
 Checked locally on 23 October 2026 after Windows CI exposed four expectations that compared raw temporary-directory spellings with canonical output paths. Only the routing tests and this verification/provenance record changed. Production helpers are unchanged.

@@ -1692,11 +1692,11 @@ def export_adoption(run_dir, accounting_path=None):
                 refs.append(directory.parent / ("consumed-" + directory.name + ".json"))
         if action_coverage["frontier"] is not None:
             refs += [Path(item["path"]) for item in action_coverage["frontier"]["required"] if item["sha256"] is not None]
-        refs = list(dict.fromkeys(refs))
+        refs = {str(path.resolve()): path for path in refs}
         result.append({**row, "decision": {"status": status, "route": task["route"] if task else None},
                        "attempt": {"attempt_id": _sha256_bytes(str(run_dir.resolve()).encode()), "status": status, "submission_intent": (run_dir / "submission-intent.json").exists(), "meter": meter},
                        "actions": actions, "action_coverage": action_coverage,
-                       "evidence": [{"path": str(path.resolve()), "sha256": _sha256_file(path)} for path in refs]})
+                       "evidence": [{"path": canonical, "sha256": _sha256_file(path)} for canonical, path in refs.items()]})
     accounting = None
     if accounting_path is not None:
         accounting, _ = _read_json_file(Path(accounting_path), "accounting_link_invalid")
@@ -3010,10 +3010,11 @@ def _export_steps(run_dir):
                     if isinstance(use,dict) and use.get("kind") == "coordinator_step_use":
                         refs += [Path(x["path"]) for x in use["result_evidence"]]
                 for stage in event.get("eliminated_stages",[]): refs += [Path(x["path"]) for x in stage["evidence"]]
+        refs = {str(path.resolve()): path for path in refs}
         item = next((t for t in packet["tasks"] if t["id"]==row["task_id"]),None) if packet else None
         result.append({**row,"decision":{"status":status,"candidate_id":item["candidate_id"] if item else None},
                        "attempt":{"attempt_id":_sha256_bytes(str(run_dir.resolve()).encode()),"status":status,"submission_intent":(run_dir/"submission-intent.json").exists(),"meter":meter},
-                       "actions":actions,"action_coverage":coverage,"evidence":[{"path":str(p.resolve()),"sha256":_sha256_file(p)} for p in dict.fromkeys(refs)]})
+                       "actions":actions,"action_coverage":coverage,"evidence":[{"path":canonical,"sha256":_sha256_file(path)} for canonical,path in refs.items()]})
     return {"schema_version":2,"producer":"routing_decisions","coverage":"registered_cli_callers_only","exported_at":_utc_now(),
             "opportunities":result,"population_registrations":[{"path":str((run_dir/"opportunities.json").resolve()),"sha256":_sha256_file(run_dir/"opportunities.json")}],
             "accounting_links":None,"accounting_gaps":["outside registered coordinator steps","whole-task cost and causal savings"]}

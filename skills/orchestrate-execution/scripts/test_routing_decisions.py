@@ -975,6 +975,8 @@ class RoutingDecisionsCliTests(unittest.TestCase):
 
 
     def test_step_continuation_uses_existing_owner_and_retains_historical_use_after_source_change(self):
+        if os.name == "nt":
+            self.root = Path(self.windows_short_path_alias(self.root))
         wb,wr,parent,root=self.make_delivery_run();delivery_path=root/'delivery.json'
         self.assertEqual(self.invoke_delivery(wb,wr,receipt=root/'receipt.json',artifact_root=root,output=delivery_path)[0],0)
         original=json.loads(delivery_path.read_bytes())
@@ -1030,6 +1032,21 @@ class RoutingDecisionsCliTests(unittest.TestCase):
         self.source.write_text('A later implementation changed the allowed source')
         data=router.export_adoption(run);router.validate_step_export(data)
         self.assertTrue(data['opportunities'][0]['actions'][0]['confirmed_use'])
+        for row in data["opportunities"]:
+            paths = [ref["path"] for ref in row["evidence"]]
+            self.assertEqual(len(paths), len(set(paths)))
+        duplicate = copy.deepcopy(data)
+        duplicate["opportunities"][0]["evidence"].append(copy.deepcopy(duplicate["opportunities"][0]["evidence"][0]))
+        with self.assertRaisesRegex(router.RoutingError, "step_export_invalid"):
+            router.validate_step_export(duplicate)
+        worker_export = router.export_adoption(wr)
+        for row in worker_export["opportunities"]:
+            paths = [ref["path"] for ref in row["evidence"]]
+            self.assertEqual(len(paths), len(set(paths)))
+        changed_hash = copy.deepcopy(data)
+        changed_hash["opportunities"][0]["evidence"][0]["sha256"] = "0" * 64
+        with self.assertRaisesRegex(router.RoutingError, "step_export_invalid"):
+            router.validate_step_export(changed_hash)
 
 
     def test_step_exact_serialized_unicode_limit_has_a_valid_control(self):
