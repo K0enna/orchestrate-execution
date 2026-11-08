@@ -80,7 +80,21 @@ The efficiency comes from **focused context, suitable model choices and less rep
 
 ## The numbers behind the approach
 
-The workflow grew out of experiments with clearer assignments and more selective model routing. Two historical comparisons show why those choices are worth making deliberately.
+### What changed in day-to-day work
+
+Across two seven-day windows around the Terra worker rollout, we observed **44% fewer output tokens per response** and **48% fewer immediate status polls per 100 turns** in routine local Codex work.
+
+| Observed measure | 19–26 Oct 2026 | 26 Oct–2 Nov 2026 |
+| --- | ---: | ---: |
+| Recorded turns | 3,820 | 2,241 |
+| Total tokens, including cached input | 18.14 billion | 10.35 billion |
+| Output tokens per recorded response | 1,193 | 672 |
+| Total tokens per recorded response | 185,107 | 201,188 |
+| Immediate status polls per 100 turns | 7.30 | 3.79 |
+
+Weekly token volume fell 43% as activity declined, while total tokens per response rose 9%. Task mix and log coverage changed. The audit tracks observed usage and polling, and leaves cost per accepted task and quota savings unmeasured. [Audit totals and methodology](docs/benchmarks.md#usage-in-day-to-day-work)
+
+The historical comparisons below use a shared task or fixture to examine assignment wording and model choice separately.
 
 ### A clearer assignment used fewer tokens
 

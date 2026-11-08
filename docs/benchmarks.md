@@ -1,6 +1,27 @@
 # Benchmarks and evidence
 
-This package publishes historical measurements and a current, reproducible decision probe. The numbers answer different questions. The historical records informed the personal workflow; they do not measure the causal effect of this public release. Fresh candidate results are reported separately.
+This package publishes an aggregate audit of routine work, historical worker comparisons and a reproducible decision probe. Each measures a different part of the workflow.
+
+## Usage in day-to-day work
+
+A 2 November 2026 audit compared two adjacent seven-day windows of observed routine local Codex work around the introduction of Terra workers. The windows start on 19 October and 26 October and end on 26 October and 2 November, respectively, at 08:05:11.857 UTC. Each includes its start and excludes its end.
+
+| Recorded measure | 19–26 Oct | 26 Oct–2 Nov |
+| --- | ---: | ---: |
+| Turns | 3,820 | 2,241 |
+| Turns with modern usage records | 3,776 | 2,189 |
+| Responses with recorded usage | 97,974 | 51,427 |
+| Input tokens | 18,018,712,017 | 10,311,890,659 |
+| Cached reads as a share of input | 97.60% | 98.19% |
+| Output tokens, including reasoning | 116,917,010 | 34,579,383 |
+| Total tokens | 18,135,629,027 | 10,346,470,042 |
+| Immediate status polls | 279 | 85 |
+
+The audit deduplicated usage by response ID and excluded activity classified as audit, helper or study work from this routine-work view. Total tokens add input and output once. Cached reads are part of input, and reasoning is part of output. Per-response figures divide by recorded usage responses. Polling counts zero-timeout status snapshots and excludes blocking waits for worker completion. The polling rate divides by all observed turns and multiplies by 100.
+
+The two windows had different workloads, model mixes and incomplete log coverage. They span multiple orchestration changes before the public v0.4.0 release. The audit did not have a complete count of accepted tasks or account charges, so it supports usage comparisons at the response and period level. Cost or time per accepted task, quota effects and the contribution of any single change remain unknown.
+
+The 5 November audit compared a second pair of adjacent seven-day windows, 22–29 October and 29 October–5 November, with boundaries at 08:20:25.546 UTC. It found 197 polls in 2,793 turns and 49 in 2,191 turns, or 7.05 and 2.24 polls per 100 turns. Potentially repeated checks rose from 5.19 to 6.85 per 100 turns, and the audit could not establish which repeats were avoidable. These windows overlap the first audit's windows.
 
 ## Historical same-model packet replay
 
