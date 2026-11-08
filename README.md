@@ -10,6 +10,10 @@ Orchestrate Execution gives Codex a playbook for turning a big request into focu
 
 [![Validation](https://github.com/K0enna/orchestrate-execution/actions/workflows/validate.yml/badge.svg)](https://github.com/K0enna/orchestrate-execution/actions/workflows/validate.yml) · [MIT licensed](LICENSE) · Built for Codex
 
+## What's new in v0.4.0
+
+Terra now handles scoped assignments that need more judgment than settled Luna work. The worker route carries the selected effort from readiness through dispatch and resume. Use the optional Decisions helper for a single ready assignment or a small choice between permissible next steps. [Release notes](CHANGELOG.md) · [Worked examples](docs/examples.md#route-one-ready-browser-assignment)
+
 ## A better plan for the work ahead
 
 Agent work gets harder to follow when tasks overlap, everyone reloads the same context, and “done” arrives without a check you can inspect. This skill gives the work a clear shape.
@@ -51,7 +55,7 @@ Bring back a source-linked comparison for the implementation decision.
 
 **Bring back the whole report.** For substantial reports, use one complete Markdown file through a task-authorized destination only after verifying that the current writer can place it there and the reader can retrieve the exact revision. Retrieve and verify the complete task-correlated document. The native reader caps each returned item at **20,000 characters**. Use bounded numbered parts only when the verified artifact route is unavailable and that fallback is explicitly selected.
 
-Direct work and active native workers remain available for everyday tasks. [Explore the modes, use cases and setup →](docs/modes.md) · [What's new in v0.4.0 →](CHANGELOG.md)
+Direct work and active native workers remain available for everyday tasks. [Explore the modes, use cases and setup →](docs/modes.md)
 
 ## From a request to a checked result
 

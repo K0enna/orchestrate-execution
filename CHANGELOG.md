@@ -1,13 +1,35 @@
 # Releases
 
-## v0.4.0 — Terra worker routes and smaller Decisions calls
+## v0.4.0 — Terra worker routing and everyday Decisions calls
 
-- Add typed Terra/medium, high, xhigh and max worker routes. Preserve the exact effort through readiness, dispatch and same-task resume.
-- Keep Luna/max first for eligible settled non-browser work and reserve Sol execution for difficult coupling or demonstrated Terra reasoning failures. Route actual browser automation to Terra/medium or high and hold when the route or access is unavailable.
-- Use the optional Decisions helper at eligible single-assignment dispatches and for small next-action and resume choices with approved inputs. Reuse unchanged packets offline.
-- Reassess delegation when new evidence settles a substantive assignment. Keep execution, review and acceptance with their accountable owners.
+8 November 2026
 
-Before upgrading, reconcile in-flight actions with their original helper and keep prior records. New helper versions change the compiler and policy identity bound to saved packets.
+v0.4.0 adds GPT-6.1 Terra as a worker for scoped implementation, diagnosis, analysis, writing and synthesis. The previous release offered two typed worker routes. This release adds four Terra routes and carries the selected model and effort through readiness checks, dispatch and continuation of the same assignment.
+
+### Choose the worker by the work
+
+| Assignment | Route |
+| --- | --- |
+| Settled non-browser work with authoritative inputs and an exact check | **Luna/max**. Keep it for established bounded writing when comparable work was accepted with little correction. |
+| Scoped work that requires judgment within a clear contract | **Terra/medium**. Use **Terra/high** for harder bounded work, such as engineering or synthesis with several constraints. |
+| Actual browser automation | **Terra/medium or high**. Hold the assignment if Terra or the required browser access is unavailable. |
+| Difficult coupled implementation with settled requirements, or a demonstrated Terra reasoning failure | **Sol/medium** is the typed execution route. The coordinator owns consequential unresolved requirements and architecture. |
+
+Use **Terra/xhigh** for a specific extra reasoning need. **Terra/max** requires explicit user choice or task evidence that lower effort will miss acceptance. Choose effort at the assignment boundary and preserve the user's model selections and independent review policy. The coordinator verifies the worker's actual settings and access before dispatch, then checks the returned result against the assignment.
+
+### Use Decisions for smaller choices
+
+When the user authorizes OpenAI routing and approves the text for export, use one Decisions call before manually choosing a route for an eligible new dispatch. A single ready assignment qualifies when it has an independent outcome worth handing off. Recheck delegation when a missing fact or a settled procedure makes a substantive chunk ready.
+
+The coordinator-step selector introduced in v0.3.0 also fits recurring choices such as which evidence to inspect next or how to continue after an interruption. Give it two to six permissible plans grounded in available evidence. Run a settled check or the sole permissible action directly. Reuse unchanged packets offline and reconcile an uncertain or pending action with its original record. File contents, local paths and check commands stay local. Decisions proposes a route or step. The coordinator remains responsible for execution and acceptance. [Worked examples](docs/examples.md#route-one-ready-browser-assignment) · [Routing guide](skills/orchestrate-execution/references/openai-routing.md)
+
+### Upgrade an existing installation
+
+Finish or reconcile in-flight routing actions with the original helper and retain their records before replacing the skill. Saved packets bind to the compiler and routing policy that created them. Use v0.4.0 for new work after the upgrade. The included helpers require Python 3.11 or later. The release provides a separate SHA-256 checksum for the installable ZIP. [Installation and upgrade guide](docs/install.md)
+
+### Verification
+
+Windows and Ubuntu CI passed on release commit `e62060e`. The local package and temporary installation checks passed, the Sol/high review reported no actionable P0–P2 findings, and the published ZIP was downloaded and checked against its checksum. Validation covered the routing lifecycle and package. This release provides no new production performance or quota measurement. [Release validation run](https://github.com/K0enna/orchestrate-execution/actions/runs/42467503509)
 
 ## v0.3.0 — Typed routing and accountable next steps
 

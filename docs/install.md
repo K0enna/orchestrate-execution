@@ -44,7 +44,13 @@ The same copied folder includes the optional OpenAI route helper, evidence proje
 
 For hardcore mode, use a runtime with separate worker chats and a terminal message back to the original chat. For native ChatGPT handover, register your existing ChatGPT destination and permitted handover scope in the project's instructions. [Mode setup and prompt examples](modes.md).
 
-Before upgrading an existing installation, compare the new folder and preserve local changes. Settle in-flight routing actions with their original helper, then replace the installation deliberately. See [saved packet reuse](../skills/orchestrate-execution/references/openai-routing.md#run-once-reuse-offline) for the source binding.
+## Upgrade to v0.4.0
+
+1. Finish or reconcile in-flight routing actions with the existing installation. Keep the original packets and receipts. Saved packets are tied to their original compiler and routing policy.
+2. Compare the replacement folder with your installation and preserve any local edits. If you download the release ZIP, compare its SHA-256 hash with `SHA256SUMS` before extracting it.
+3. Replace the installed skill folder after the old actions are settled. Confirm that Codex discovers the skill, then use the new helper for new assignments.
+
+[Public release and checksum](https://github.com/K0enna/orchestrate-execution/releases/tag/v0.4.0) · [Saved packet reuse](../skills/orchestrate-execution/references/openai-routing.md#run-once-reuse-offline)
 
 ## Give it a real task
 

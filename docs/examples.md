@@ -29,6 +29,18 @@ The formatter worker owns only `src/percent.py` and `tests/test_percent.py`, wit
 
 If inspection instead shows both changes depend on the same parsing invariant, keep one implementation owner. Separate filenames alone do not justify concurrent writers.
 
+## Route one ready browser assignment
+
+The user asks the coordinator to download the current public catalog CSV using a browser while the coordinator prepares the comparison worksheet. The source page and download destination are agreed. The worker owns the browser session for this assignment and must open the saved file and verify its headers. The user authorizes OpenAI routing and approves the summary of the objective and browser requirement for export. The output path and exact check stay local.
+
+One assignment is enough for an eligible Decisions call. Terra/medium fits the bounded browser work. The coordinator verifies the selected effort, browser access and input before dispatch. If the required route or access is unavailable, the assignment stays held. On return, the coordinator checks the saved artifact and evidence that the worker opened it. [Worker routing procedure](../skills/orchestrate-execution/references/openai-routing.md#run-once-reuse-offline)
+
+## Choose the next check after an interruption
+
+A worker was interrupted after starting a local export. The coordinator finds two permissible inspections. It can read the existing terminal receipt or inspect the export folder for the expected artifact. Both are read-only and the export's completion is still unknown.
+
+After export approval for the summaries, the coordinator can ask Decisions to choose between those inspections once. It runs the chosen check through the existing owner and records what the check found. A partial file or a pending receipt keeps completion unresolved. If the receipt is the only permissible check, read it directly. [Coordinator-step procedure](../skills/orchestrate-execution/references/openai-routing.md#select-and-settle-a-coordinator-step)
+
 ## A shared session conflict
 
 Request: prepare two catalog exports from the same admin account. Worker A owns the logged-in browser profile and is still changing filters. Worker B has a different output file, but needs that profile too.
