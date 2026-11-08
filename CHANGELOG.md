@@ -1,5 +1,14 @@
 # Releases
 
+## v0.4.0 — Terra worker routes and smaller Decisions calls
+
+- Add typed Terra/medium, high, xhigh and max worker routes. Preserve the exact effort through readiness, dispatch and same-task resume.
+- Keep Luna/max first for eligible settled non-browser work and reserve Sol execution for difficult coupling or demonstrated Terra reasoning failures. Route actual browser automation to Terra/medium or high and hold when the route or access is unavailable.
+- Use the optional Decisions helper at eligible single-assignment dispatches and for small next-action and resume choices with approved inputs. Reuse unchanged packets offline.
+- Reassess delegation when new evidence settles a substantive assignment. Keep execution, review and acceptance with their accountable owners.
+
+Before upgrading, reconcile in-flight actions with their original helper and keep prior records. New helper versions change the compiler and policy identity bound to saved packets.
+
 ## v0.3.0 — Typed routing and accountable next steps
 
 23 October 2026

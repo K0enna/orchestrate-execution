@@ -36,14 +36,23 @@ ADVISER_PATH = ROUTER_PATH.with_name("decision_adviser.py")
 ROUTES: dict[str, dict[str, str | None]] = {
     "worker_luna": {"model": "gpt-6-luna", "reasoning_effort": "max"},
     "worker_sol": {"model": "gpt-6.1-sol", "reasoning_effort": "medium"},
+    "worker_terra": {"model": "gpt-6.1-terra", "reasoning_effort": "medium"},
+    "worker_terra_high": {"model": "gpt-6.1-terra", "reasoning_effort": "high"},
+    "worker_terra_xhigh": {"model": "gpt-6.1-terra", "reasoning_effort": "xhigh"},
+    "worker_terra_max": {"model": "gpt-6.1-terra", "reasoning_effort": "max"},
     "owner": {"model": None, "reasoning_effort": None},
     "hold": {"model": None, "reasoning_effort": None},
 }
+WORKER_ROUTES = frozenset(route for route, spec in ROUTES.items() if spec["model"] is not None)
 ROUTE_DESCRIPTIONS = {
     "hold": "Do not execute yet because an unresolved gate or missing information prevents a safe assignment.",
     "owner": "Keep with the current coordinator for consequential unresolved architecture, specification, evidence, or privacy judgment; tiny or inseparable work; or when no useful independent owner exists.",
-    "worker_luna": "GPT-6 Luna/max for settled, bounded execution with authoritative inputs and an exact check.",
-    "worker_sol": "GPT-6.1 Sol/medium for broader coupled coding outside the Luna route.",
+    "worker_luna": "GPT-6 Luna/max for settled mechanical work with authoritative inputs and an exact check, or an established bounded writing workflow with comparable accepted outcomes and low correction burden.",
+    "worker_sol": "GPT-6.1 Sol/medium for difficult coupled implementation or evidenced Terra reasoning failures after requirements are resolved.",
+    "worker_terra": "GPT-6.1 Terra/medium is the preferred starting worker for scoped implementation, bug fixes, tests, analysis, tool workflows and writing with settled requirements and concrete acceptance.",
+    "worker_terra_high": "GPT-6.1 Terra/high is the stronger default for harder bounded work, including supplied-source synthesis or complex editorial constraints.",
+    "worker_terra_xhigh": "GPT-6.1 Terra/xhigh requires a concrete extra reasoning need for the bounded task.",
+    "worker_terra_max": "GPT-6.1 Terra/max requires explicit user choice or task-specific evidence that lower effort will not meet acceptance.",
 }
 READY_MESSAGE = (
     "READY only. Do not use tools or implement anything in the first turn. "
@@ -51,11 +60,21 @@ READY_MESSAGE = (
 )
 REQUEST_STATE = (
     "Choose one route for each eligible task. This choice only selects a possible "
-    "assignment and does not grant authority. Use worker_luna for settled bounded "
-    "execution with authoritative inputs and an exact check; worker_sol for broader "
-    "coupled coding outside that route; owner for consequential unresolved judgment, "
-    "tiny or inseparable work, or no useful independent ownership; hold if a task is "
-    "not ready for a responsible assignment. Do not use confidence as a gate."
+    "assignment and does not grant authority. For actual browser automation select worker_terra or worker_terra_high; never select Luna or Sol as the browser operator. If Terra or required browser access is unavailable, hold. Use worker_luna for other settled mechanical work "
+    "with authoritative inputs and an exact check. Retain established bounded Luna writing only "
+    "with source-bound accepted outcomes, low correction burden and comparable inputs, requirements "
+    "and checks; this does not include open-ended editorial policy or cross-source judgment. "
+    "Do not replace successful Luna work from an aggregate benchmark alone. Use worker_terra as the preferred starting "
+    "worker for scoped implementation, bug fixes, tests, analysis, tool workflows and writing "
+    "with settled requirements and concrete acceptance; use worker_terra_high as the stronger default for harder bounded "
+    "work. Use worker_terra_xhigh only for a concrete extra reasoning need; use worker_terra_max "
+    "only on explicit user choice or task-specific evidence that lower effort will not meet acceptance. "
+    "Do not use an automatic effort ladder or retry chain. Use worker_sol for difficult coupled implementation or evidenced "
+    "Terra reasoning failures after requirements are resolved. Code or multiple files alone do not "
+    "select Sol. Effort does not expand authority or substitute for missing requirements. "
+    "Preserve source claims, uncertainties and voice under the existing content owner. Use owner "
+    "for consequential unresolved requirements, architecture or other judgment, tiny or inseparable "
+    "work, or no useful independent ownership; hold if prerequisites are missing or a task is not ready for a responsible assignment. Do not use confidence as a gate."
 )
 
 
@@ -310,7 +329,7 @@ def _prepared_request(batch: dict[str, Any]) -> dict[str, Any]:
         questions[task["id"]] = {
             "type": "choice",
             "instructions": instructions,
-            "choices": ROUTE_DESCRIPTIONS,
+            "choices": dict(sorted(ROUTE_DESCRIPTIONS.items())),
         }
     request = {"state": REQUEST_STATE, "questions": questions}
     if not questions:
@@ -471,7 +490,10 @@ def _assignment_message(
         "review and final acceptance.\n\n"
         "Act as an execution leaf. Do not launch agents, tasks, or model-backed helpers. "
         "The route choice grants no authority to expand scope, bypass review, or make "
-        "acceptance decisions. Do not take external actions or contact services.\n\n"
+        "acceptance decisions. Use only tools and services explicitly authorized in this packet; "
+        "return missing authority to the original coordinator. Without that grant, do not take "
+        "external actions or contact services. The route grants no permission to publish, send "
+        "messages, install software, or change accounts.\n\n"
         f"Execution assignment for the original coordinator {coordinator_id}.\n"
         f"Objective:\n{task['objective']}\n\n"
         f"Context:\n{task['context']}\n\n"
@@ -1264,7 +1286,7 @@ def _action_state(directory, row):
         if (delivery.get("task_id") != row["task_id"] or delivery.get("parent_thread_id") != row["coordinator_id"]
                 or delivery.get("run_id") != reservation["run_id"]
                 or delivery.get("source_packet", {}).get("sha256") != reservation["packet_sha256"]
-                or delivery.get("route") not in {"worker_luna", "worker_sol"}
+                or delivery.get("route") not in WORKER_ROUTES
                 or delivery.get("model") != ROUTES[delivery["route"]]["model"]
                 or delivery.get("reasoning_effort") != ROUTES[delivery["route"]]["reasoning_effort"]
                 or _sha256_file(Path(reservation["decision_run_dir"]) / "packets.json") != reservation["packet_sha256"]):
@@ -1770,7 +1792,7 @@ def prepare_delivery(
     if len(matching) != 1:
         raise RoutingError("delivery_task_invalid")
     task = matching[0]
-    if task.get("route") not in {"worker_luna", "worker_sol"}:
+    if task.get("route") not in WORKER_ROUTES:
         raise RoutingError("delivery_route_not_worker")
     row = _current_opportunity(batch_path, resolved_run_dir, task_id, packet_raw)
     if not row["eligible"]:
@@ -1782,7 +1804,7 @@ def prepare_delivery(
         override = _owner_record_identity(override, resolved_run_dir)
         if (not isinstance(override, dict) or (type(override.get("schema_version")) is not int or override.get("schema_version") != TRAIL_VERSION)
                 or override.get("owner_id") != parent_thread or override.get("task_id") != task_id
-                or override.get("route") not in {"worker_luna", "worker_sol"}
+                or override.get("route") not in WORKER_ROUTES
                 or not _nonempty_text(override.get("reason"))):
             raise RoutingError("override_invalid")
         _evidence(override.get("evidence"))
@@ -1970,7 +1992,7 @@ def prepare_dispatch(batch_path, run_dir, request_path):
     packet_raw = emit_batch(batch_path, run_dir, selected_task_id=request["task_id"])
     _, _, packet = _verified_stored_packet(run_dir, packet_raw)
     task = next((t for t in packet["tasks"] if t["id"] == request["task_id"]), None)
-    if not task or task["route"] not in {"worker_luna", "worker_sol"}:
+    if not task or task["route"] not in WORKER_ROUTES:
         raise RoutingError("delivery_route_not_worker")
     row = _current_opportunity(batch_path, run_dir.resolve(), request["task_id"], packet_raw)
     actions = _actions(row)
@@ -2291,12 +2313,12 @@ def readiness_result(
         return _readiness_block(
             "task_missing", task_id=task_id, proof=proof, observed=observed_values
         )
-    if task.get("route") not in {"worker_luna", "worker_sol"}:
+    if task.get("route") not in WORKER_ROUTES:
         return _readiness_block(
             "task_not_routable", task_id=task_id, proof=proof, observed=observed_values
         )
     if expected_route is not None:
-        if expected_route not in {"worker_luna", "worker_sol"}:
+        if expected_route not in WORKER_ROUTES:
             return _readiness_block("task_not_routable", task_id=task_id, proof=proof)
         task = {**task, **ROUTES[expected_route]}
     expected = {

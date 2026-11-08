@@ -44,7 +44,7 @@ The same copied folder includes the optional OpenAI route helper, evidence proje
 
 For hardcore mode, use a runtime with separate worker chats and a terminal message back to the original chat. For native ChatGPT handover, register your existing ChatGPT destination and permitted handover scope in the project's instructions. [Mode setup and prompt examples](modes.md).
 
-Upgrading an existing installation follows the same compare-first rule: review the new folder and replace it deliberately after preserving any local changes.
+Before upgrading an existing installation, compare the new folder and preserve local changes. Settle in-flight routing actions with their original helper, then replace the installation deliberately. See [saved packet reuse](../skills/orchestrate-execution/references/openai-routing.md#run-once-reuse-offline) for the source binding.
 
 ## Give it a real task
 

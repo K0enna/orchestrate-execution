@@ -68,6 +68,10 @@ KNOWN_COMPLETE_REPORT = {
                 {"value": "owner", "probability": 0.1},
                 {"value": "worker_luna", "probability": 0.7},
                 {"value": "worker_sol", "probability": 0.1},
+                {"value": "worker_terra", "probability": 0.0},
+                {"value": "worker_terra_high", "probability": 0.0},
+                {"value": "worker_terra_max", "probability": 0.0},
+                {"value": "worker_terra_xhigh", "probability": 0.0},
             ],
             "confidence": 0.8,
             "confidence_semantics": "separate_provider_field",
@@ -81,6 +85,10 @@ KNOWN_COMPLETE_REPORT = {
                 {"value": "owner", "probability": 0.1},
                 {"value": "worker_luna", "probability": 0.1},
                 {"value": "worker_sol", "probability": 0.7},
+                {"value": "worker_terra", "probability": 0.0},
+                {"value": "worker_terra_high", "probability": 0.0},
+                {"value": "worker_terra_max", "probability": 0.0},
+                {"value": "worker_terra_xhigh", "probability": 0.0},
             ],
             "confidence": 0.8,
             "confidence_semantics": "separate_provider_field",
@@ -94,6 +102,10 @@ KNOWN_COMPLETE_REPORT = {
                 {"value": "owner", "probability": 0.7},
                 {"value": "worker_luna", "probability": 0.1},
                 {"value": "worker_sol", "probability": 0.1},
+                {"value": "worker_terra", "probability": 0.0},
+                {"value": "worker_terra_high", "probability": 0.0},
+                {"value": "worker_terra_max", "probability": 0.0},
+                {"value": "worker_terra_xhigh", "probability": 0.0},
             ],
             "confidence": 0.8,
             "confidence_semantics": "separate_provider_field",
@@ -1107,6 +1119,69 @@ class RoutingDecisionsCliTests(unittest.TestCase):
         self.assertFalse(proof_path.exists())
         self.assertEqual(self.trail_cli("dispatch", batch, run, "--task-id", "small", "--record", artifacts["send_input"]["path"])[0], 2)
 
+    def test_terra_routes_preserve_exact_effort_through_dispatch_and_resume(self):
+        # The public lifecycle owns this regression: a valid Terra choice must
+        # remain usable after compilation, not just appear in a route table. The
+        # classifier returns probabilities in serialized request choice order.
+        for route, effort, wrong_effort in (("worker_terra", "medium", "max"),
+                                           ("worker_terra_high", "high", "medium"),
+                                           ("worker_terra_xhigh", "xhigh", "high"),
+                                           ("worker_terra_max", "max", "medium")):
+            with self.subTest(route=route):
+                root = self.root / route
+                root.mkdir()
+                parent = str(uuid4())
+                batch = self.batch_file(route + ".json", [self.task("small")], coordinator_id=parent)
+                run = self.root / (route + "-run")
+                report = json.loads(self.report_bytes(["small"]))
+                answer = report["answers"]["small"]
+                answer["choice"] = route
+                answer["probabilities"] = [
+                    {"value": name, "probability": 1.0 if name == route else 0.0}
+                    for name in ("hold", "owner", "worker_luna", "worker_sol", "worker_terra", "worker_terra_high", "worker_terra_max", "worker_terra_xhigh")
+                ]
+                packet = json.loads(self.run_success(batch, run, json.dumps(report).encode()))
+                selected = packet["tasks"][0]
+                self.assertEqual((selected["route"], selected["model"], selected["reasoning_effort"]),
+                                 (route, "gpt-6.1-terra", effort))
+                request, data = self.prepare_request(parent, root)
+                ready = data["readiness"]
+                session = Path(ready["session_path"])
+                self.write_readiness_session(session, session_id=ready["thread_id"], source="vscode",
+                                             model="gpt-6.1-terra", effort=wrong_effort)
+                code, blocked, _ = self.invoke_readiness(batch, run, session, worker_kind="app",
+                    agent_path=None, parent_thread=parent, thread_id=ready["thread_id"])
+                self.assertEqual((code, blocked["category"]), (2, "effort_mismatch"))
+                code, blocked = self.trail_cli("prepare-dispatch", batch, run, "--record", request)
+                self.assertEqual((code, blocked["category"]), (2, "dispatch_readiness_blocked"))
+                self.assertFalse(list(root.glob("prepare-*.json")))
+                self.write_readiness_session(session, session_id=ready["thread_id"], source="vscode",
+                                             model="gpt-6.1-terra", effort=effort)
+                code, prepared = self.trail_cli("prepare-dispatch", batch, run, "--record", request)
+                self.assertEqual(code, 0, prepared)
+                self.assertEqual((prepared["route"], prepared["model"], prepared["reasoning_effort"]),
+                                 (route, "gpt-6.1-terra", effort))
+                delivery_path = Path(prepared["artifacts"]["delivery"]["path"])
+                original_bytes = delivery_path.read_bytes()
+                delivery = json.loads(original_bytes)
+                interrupted, _ = self.action_input(delivery, route + "-interrupted.json", state="interrupted")
+                self.assertEqual(self.trail_cli("observe", batch, run, "--task-id", "small", "--record", interrupted)[0], 0)
+                evidence, _ = self.action_input(delivery, route + "-continuation.json")
+                continued_path = root / "continued.json"
+                code, continued = self.trail_cli("resume", batch, run, "--task-id", "small",
+                    "--run-id", str(uuid4()), "--receipt", root / "continued-receipt.json",
+                    "--artifact-root", root, "--output", continued_path, "--callback-authorized",
+                    "--reason", "Finish the same supported-source draft", "--record", evidence)
+                self.assertEqual(code, 0, continued)
+                resumed = json.loads(continued_path.read_bytes())
+                self.assertEqual((resumed["route"], resumed["model"], resumed["reasoning_effort"]),
+                                 (route, "gpt-6.1-terra", effort))
+                code, dispatched = self.trail_cli("dispatch", batch, run, "--task-id", "small", "--record",
+                    self.dispatch_input(resumed, route + "-continued-dispatch.json"))
+                self.assertEqual(code, 0, dispatched)
+                self.assertEqual(resumed["source_packet"], delivery["source_packet"])
+                self.assertEqual(delivery_path.read_bytes(), original_bytes)
+
     def test_native_prepare_dispatch_uses_final_delivery(self):
         batch, run, parent, root = self.make_delivery_run()
         request, data = self.prepare_request(parent, root)
@@ -1934,7 +2009,10 @@ class RoutingDecisionsCliTests(unittest.TestCase):
             "review and final acceptance.\n\n"
             "Act as an execution leaf. Do not launch agents, tasks, or model-backed helpers. "
             "The route choice grants no authority to expand scope, bypass review, or make "
-            "acceptance decisions. Do not take external actions or contact services.\n\n"
+            "acceptance decisions. Use only tools and services explicitly authorized in this packet; "
+            "return missing authority to the original coordinator. Without that grant, do not take "
+            "external actions or contact services. The route grants no permission to publish, send "
+            "messages, install software, or change accounts.\n\n"
         )
         assignments = (small, broad)
         self.assertEqual(

@@ -10,8 +10,14 @@ The helper's route table is fixed:
 
 | Route | Model and effort | Use |
 | --- | --- | --- |
-| `worker_luna` | GPT-6 Luna / max | Settled, bounded execution with authoritative inputs and a concrete check. |
-| `worker_sol` | GPT-6.1 Sol / medium | Broader coupled coding that is outside Luna's eligibility. |
+| `worker_luna` | GPT-6 Luna / max | Settled non-browser mechanical work, or proven bounded writing with comparable inputs and low correction burden. |
+| `worker_terra` | GPT-6.1 Terra / medium | Scoped implementation, analysis, tool work and writing beyond Luna's lane. |
+| `worker_terra_high` | GPT-6.1 Terra / high | Harder bounded engineering, synthesis or editorial work. |
+| `worker_terra_xhigh` | GPT-6.1 Terra / xhigh | A bounded task with a concrete need for extra reasoning. |
+| `worker_terra_max` | GPT-6.1 Terra / max | Explicit user choice or task-specific evidence that lower effort cannot meet acceptance. |
+| `worker_sol` | GPT-6.1 Sol / medium | Difficult coupled implementation or a demonstrated Terra reasoning failure once requirements are settled. |
+
+The selector also returns `owner` for direct coordinator work and `hold` when a prerequisite is missing. The policy guides the recommendation; the coordinator checks that it fits before dispatch. For actual browser automation, use Terra/medium or high. If Terra or required browser access is unavailable, hold the assignment. Select effort once for the assignment. Review routing follows the user's existing review policy.
 
 These are the helper's supported routes. Other direct or interactive work follows the models and controls available in the current runtime. The selected route is a recommendation for the original coordinator to dispatch. Confirm the worker's current configuration, permissions, project and input access before sending the saved assignment. The worker does not add a routing layer. The coordinator owns review and final acceptance.
 
@@ -21,7 +27,7 @@ Readiness keeps the raw session and latest-turn cwd values in diagnostics, while
 
 ## Run once, reuse offline
 
-From this reference's sibling `scripts/` directory, run the eligible batch once:
+From the skill's `scripts/` directory, run the eligible batch once. A single independently useful, ready assignment qualifies when the user has approved export and the normal dispatch checks are satisfied. Keep settled direct work with its owner:
 
 ```text
 python -B routing_decisions.py run BATCH NEW_RUN_DIRECTORY --summary
@@ -34,6 +40,8 @@ python -B routing_decisions.py emit BATCH EXISTING_RUN_DIRECTORY --summary
 ```
 
 `emit` makes no provider request. It checks the batch, source files, compiler and transport identity and returns the same saved assignment only when those inputs are unchanged. A material task change needs a new disposition. Existing, pending or uncertain runs must be reconciled through their original record; do not replay them under another ID. Delivery, readiness and dispatch records prepare data for the coordinator, but the helper does not launch or send anything.
+
+Keep the prior helper and its companion files at their original paths until their in-flight work is settled. Saved packets are bound to their compiler and routing policy. Reconcile existing actions with the original source and runtime; preserve their records and identities. Use the upgraded package for new work after those actions are settled.
 
 ## Project a receipt, thread read or command result
 
@@ -51,7 +59,7 @@ The result keeps a source path and hash, a status, failure and unknown counts, a
 
 Coordinator-step batches use `schema_version: 3` and `kind: "coordinator_step"`; do not mix them with worker batches. They compare two to six already permissible plans at one boundary: `next_action`, `resume_triage` or `analytics_interpretation`. Evidence and its hashes, local plans, source code, checks, authority records and private IDs stay local. Only approved goal, fact and candidate-description text is projected. If export is not authorized, the existing workflow stays direct or held. One candidate is direct; no candidates hold.
 
-The version 3 selector replaces a coordinator's comparison of already known alternatives. Keep deterministic calculations, source and permission checks, pending sends, ready-worker release and settled choices in their existing owners. An unchanged packet can be emitted offline.
+Use the version 3 selector for small recurring choices before manually comparing already known alternatives. Examples include choosing the next evidence check and deciding between two permitted ways to continue after an interruption. Keep deterministic calculations, source and permission checks, pending sends, ready-worker release and settled choices in their existing owners. An unchanged packet can be emitted offline.
 
 At a resume or evidence-triage boundary, inspect the selected step locally:
 

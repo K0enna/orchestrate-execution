@@ -51,7 +51,7 @@ Bring back a source-linked comparison for the implementation decision.
 
 **Bring back the whole report.** For substantial reports, use one complete Markdown file through a task-authorized destination only after verifying that the current writer can place it there and the reader can retrieve the exact revision. Retrieve and verify the complete task-correlated document. The native reader caps each returned item at **20,000 characters**. Use bounded numbered parts only when the verified artifact route is unavailable and that fallback is explicitly selected.
 
-Direct work and active native workers remain available for everyday tasks. [Explore the modes, use cases and setup →](docs/modes.md) · [What's new in v0.3.0 →](CHANGELOG.md)
+Direct work and active native workers remain available for everyday tasks. [Explore the modes, use cases and setup →](docs/modes.md) · [What's new in v0.4.0 →](CHANGELOG.md)
 
 ## From a request to a checked result
 
